@@ -91,4 +91,6 @@ if __name__ == '__main__':
 
     # tsne plot for top 10 similar word
     model = word2vec.Word2Vec.load(MODEL_PATH)
-    tsne_plot(for_word='', w2v_model=model)
+    check_list = ["晶圓", "光罩", "黃光區", "蝕刻", "電晶體", "濺鍍", "顯影", "EUV", "奈米"]
+    for checkIndex, checkElement in enumerate(check_list):
+        tsne_plot(for_word=checkElement, w2v_model=model)
