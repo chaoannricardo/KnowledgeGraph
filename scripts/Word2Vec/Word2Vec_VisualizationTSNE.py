@@ -83,7 +83,7 @@ def tsne_plot(for_word, w2v_model):
 
 if __name__ == '__main__':
     # configurations
-    MODEL_PATH = "../models/210408_word2vec.model"
+    MODEL_PATH = "../../models/210408_word2vec.model"
 
     # plotting settings
     sns.set_style("darkgrid")
@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
     # tsne plot for top 10 similar word
     model = word2vec.Word2Vec.load(MODEL_PATH)
-    tsne_plot(for_word='二氣化矽', w2v_model=model)
+    tsne_plot(for_word='', w2v_model=model)
