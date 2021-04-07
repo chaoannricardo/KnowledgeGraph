@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
     # tsne plot for top 10 similar word
     model = word2vec.Word2Vec.load(MODEL_PATH)
-    tsne_plot(for_word='蝕刻', w2v_model=model)
+    tsne_plot(for_word='二氣化矽', w2v_model=model)
