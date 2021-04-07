@@ -4,6 +4,10 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 
+'''
+# other functions
+print(model.wv.similarity("晶圓", "價值"))
+'''
 
 if __name__ == '__main__':
     # configurations
