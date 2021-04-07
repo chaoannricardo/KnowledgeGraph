@@ -24,19 +24,18 @@ if __name__ == '__main__':
         "relation_7,similarity_7,relation_8,similarity_8,relation_9,similarity_9\n"
     saving_file.write(header_text)
     for entityIndex, entityElement in enumerate(tqdm(entity_list)):
-        saving_file.write(str(entityElement) + ",")
         for targetIndex in range((entityIndex+1), (len(entity_list))):
             try:
                 model.wv.most_similar([entityElement, entity_list[targetIndex]])
-                saving_file.write(str(entity_list[targetIndex]) + ",")
+                saving_file.write(str(entityElement) + "," + str(entity_list[targetIndex]) + ",")
                 for relationIndex, relationElement in enumerate(
                         model.wv.most_similar([entityElement, entity_list[targetIndex]])):
                     if relationIndex + 1 != (len(model.wv.most_similar([entityElement, entity_list[targetIndex]]))):
                         saving_file.write(str(relationElement[0]) + ",")
-                        saving_file.write(str(relationElement[1]) + ",")
+                        saving_file.write(str(np.around(relationElement[1], decimals=4)) + ",")
                     else:
                         saving_file.write(str(relationElement[0]) + ",")
-                        saving_file.write(str(relationElement[1]) + "\n")
+                        saving_file.write(str(np.around(relationElement[1], decimals=4)) + "\n")
             except KeyError:
                 pass
 
