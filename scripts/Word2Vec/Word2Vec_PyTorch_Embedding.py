@@ -1,4 +1,9 @@
 # -*- coding: utf8 -*-
+"""
+Word2Vec Implementation with Pytorch
+Pytorch Embedding Documentation: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html
+Reference: https://cloud.tencent.com/developer/article/1613950
+"""
 import os
 from collections import Counter
 from sklearn.metrics.pairwise import cosine_similarity
@@ -14,10 +19,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as tud
 
-'''
-Word2Vec Implementation with Pytorch
-Reference: https://cloud.tencent.com/developer/article/1613950
-'''
 
 
 def import_data(data_path, vocab_size):
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     random.seed(RANDOM_SEED)
     np.random.seed(RANDOM_SEED)
     torch.manual_seed(RANDOM_SEED)
-    
+
 
 
 
