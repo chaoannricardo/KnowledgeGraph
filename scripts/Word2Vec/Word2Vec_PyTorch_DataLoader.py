@@ -45,9 +45,12 @@ class Word2Vec_PyTorch_Embedding(tud.Dataset):
         center_words = self.text_encoded[idx]
         pos_indices = list(range(idx - self.context_window, idx)) + list(range(idx + 1, idx + 1 + self.context_window))
         # preventing the indices fall outside the boundary
-        pos_words = torch.Tensor([i % len(self.text_encoded) for i in pos_indices])
+        pos_indices = [i % len(self.text_encoded) for i in pos_indices]
+        pos_words = self.text_encoded[pos_indices]
+
         neg_words = torch.multinomial(self.word_freqs, self.negative_sample_count * pos_words.shape[0])
-        return center_words, pos_indices, neg_words
+
+        return center_words, pos_words, neg_words
 
 
 
