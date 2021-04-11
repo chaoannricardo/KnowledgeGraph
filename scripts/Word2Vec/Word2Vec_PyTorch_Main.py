@@ -1,8 +1,15 @@
 # -*- coding: utf8 -*-
 """
 Word2Vec Implementation with Pytorch
+Code Reference: https://cloud.tencent.com/developer/article/1613950
+
+Other related information:
 Pytorch Embedding Documentation: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html
-Reference: https://cloud.tencent.com/developer/article/1613950
+Pytorch Tensor: https://pytorch.org/docs/stable/tensors.html
+Pytorch Optimizer: https://pytorch.org/docs/stable/optim.html
+Optimizer Reference: https://mlfromscratch.com/optimizers-explained/#/
+Batch Size Impact: https://medium.com/deep-learning-experiments/effect-of-batch-size-on-neural-net-training-c5ae8516e57
+
 """
 import os
 from collections import Counter
@@ -76,7 +83,7 @@ if __name__ == '__main__':
 
     optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
 
-    for e in range(1):
+    for e in range(EPOCHS):
         for i, (input_labels, pos_labels, neg_labels) in enumerate(dataloader):
             input_labels = input_labels.long()
             pos_labels = pos_labels.long()
@@ -90,7 +97,7 @@ if __name__ == '__main__':
             optimizer.step()
 
             if i % 100 == 0:
-                print("Epoch ", e, " Iteration ", i, loss.item())
+                print("Epoch ", (e + 1), " Iteration ", i, loss.item())
 
     embedding_weights = model.input_embedding()
     torch.save(model.state_dict(), "embedding-{}.th".format(EMBEDDING_SIZE))

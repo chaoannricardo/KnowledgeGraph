@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 """
 Word2Vec DataLoaders Reference: https://cloud.tencent.com/developer/article/1613950
+PyTorch Embedding: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html
 """
 import numpy as np
 import pandas as pd
@@ -37,22 +38,29 @@ class EmbeddingModel(nn.Module):
 
         input_embedding = torch.unsqueeze(input_embedding, 2)  # [batch_size, embed_size, 1]
 
+        # positive sample neuron layer
         pos_dot = torch.bmm(pos_embedding, input_embedding)  # [batch_size, (window * 2), 1]
         pos_dot = torch.squeeze(pos_dot, 2)  # [batch_size, (window * 2)]
 
-        neg_dot = torch.bmm(neg_embedding, -input_embedding) # [batch_size, (window * 2 * K), 1]
-        neg_dot = torch.squeeze(neg_dot, 2)
+        # negative sample layer
+        neg_dot = torch.bmm(neg_embedding, -input_embedding)  # [batch_size, (window * 2 * K), 1]
+        neg_dot = torch.squeeze(neg_dot, 2) # [batch_size, (window * 2)]
 
-        log_pos = torch.sum(F.logsigmoid(pos_dot), 1)
-        log_neg = torch.sum(F.logsigmoid(neg_dot), 1)
+        # activation function
+        log_pos = torch.sum(F.log_softmax(pos_dot), 1)
+        log_neg = torch.sum(F.log_softmax(neg_dot), 1)
 
         loss = log_pos + log_neg
 
         return -loss
 
     def input_embedding(self):
-        return self.in_embed.weight.numpy()
+        return self.in_embed.weight.detach().numpy()
 
 
 if __name__ == '__main__':
-    pass
+    embedding = nn.Embedding(1, 3)
+    input = torch.LongTensor([[1, 2, 4, 5], [4, 3, 2, 9]])
+    print(input.shape)
+    embed = embedding(input)
+    print(embed.shape)
