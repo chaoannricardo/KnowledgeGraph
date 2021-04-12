@@ -79,7 +79,7 @@ if __name__ == '__main__':
                                 batch_size=BATCH_SIZE,
                                 shuffle=True)
 
-    model = Word2Vec_PyTorch_Model.EmbeddingModel(MAX_VOCAB_SIZE, EMBEDDING_SIZE)
+    model = Word2Vec_PyTorch_Model.EmbeddingModelSkipGram(MAX_VOCAB_SIZE, EMBEDDING_SIZE)
 
     optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
 

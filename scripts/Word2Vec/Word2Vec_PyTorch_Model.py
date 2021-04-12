@@ -2,6 +2,12 @@
 """
 Word2Vec DataLoaders Reference: https://cloud.tencent.com/developer/article/1613950
 PyTorch Embedding: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html
+PyTorch Autograd: https://pytorch.org/docs/stable/autograd.html
+
+Other Implementation Guide (Skip-gram):
+* https://adoni.github.io/2017/11/08/word2vec-pytorch/
+* https://zhuanlan.zhihu.com/p/82683575
+* https://github.com/n0obcoder/Skip-Gram-Model-PyTorch
 """
 import numpy as np
 import pandas as pd
@@ -10,9 +16,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class EmbeddingModel(nn.Module):
+class EmbeddingModelSkipGram(nn.Module):
+    """
+    PyTorch model implementation of Skip-gram model
+    """
     def __init__(self, vocab_size, embed_size):
-        super(EmbeddingModel, self).__init__()
+        super(EmbeddingModelSkipGram, self).__init__()
 
         self.vocab_size = vocab_size
         self.embed_size = embed_size
