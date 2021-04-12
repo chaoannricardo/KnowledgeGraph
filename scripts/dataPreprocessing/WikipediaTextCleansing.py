@@ -19,8 +19,9 @@ if __name__ == '__main__':
     NEGLECT_HTTP_TYPE = ["http", "https", "styleborder:", "text-align:", "cellspacing", "Wikipedia:"]
     NEGLECT_SUBSTRING = ["&lt;", "ref&gt;", "ref", "OED&quot;", "&gt;", "name&quot;", "{{Cite web",\
                          "lamberg-karlovsky-p5&quot;", ":3&quot;" "zbjn1&quot;", "&quot;", "Category:", "solid",\
-                         "#ddd", "margin: auto;"] + NEGLECT_HTTP_TYPE
-    NEGLECT_LINE_SYMBOL = ["|", "{", "\n", " ", "_", "#"]
+                         "#ddd", "margin: auto;", "name", "KneeboneCite", "book", "LaTorreCite", "cite journal", "zh",\
+                         "amencps-21", "groupa", "brencps-21", "cnencps-21", "cntwencps-21"] + NEGLECT_HTTP_TYPE
+    NEGLECT_LINE_SYMBOL = ["|", "{", "\n", " ", "_", "#", ":"]
     # # Common, usually entity100)]
 
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
         fileExport = codecs.open(DATA_EXPORT_PATH + fileElement, "w", encoding="utf8", errors="ignore")
         for line in tqdm(fileImport):
             # skip line if fulfill certain sentence structure
-            if line[0:4] == "&lt;" or line[0:2] == " |" or line[0:3] == " | " or line[0] == " " or\
+            if line[0:4] == "&lt;" or line[0:5] == "&amp;" or line[0:2] == " |" or line[0:3] == " | " or line[0] == " " or\
                     line[0:7] == "[[File:" or len(line) < 20 or line[0] in NEGLECT_LINE_SYMBOL:
                 continue
             # check if characters fulfill certain structure
