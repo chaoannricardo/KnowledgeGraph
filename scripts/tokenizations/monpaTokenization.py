@@ -58,6 +58,7 @@ if __name__ == '__main__':
         "Counts": []
     })
 
+    lineCount = 0
     for fileIndex, fileElement in enumerate(tqdm(os.listdir(DATA_IMPORT_DIR))):
         # open file to import
         file = codecs.open(DATA_IMPORT_DIR + fileElement, 'r', encoding='utf8', errors='ignore')
@@ -70,6 +71,7 @@ if __name__ == '__main__':
             textList = re.split(pattern, textElement)
             # start pseg text
             for subIndex, subElement in enumerate(textList):
+                lineCount += 1
                 psegResult = []
                 total_entity_list = []
                 total_label_list = []
@@ -176,7 +178,7 @@ if __name__ == '__main__':
                                 }, ignore_index=True)
                             else:
                                 update_index = pd.Index(data_entities.iloc[:, 0].tolist()).get_loc(tokenElement)
-                                data_entities.loc[update_index, "Counts"] += 1
+                                data_entities.iloc[update_index, 1] += 1
                         else:
                             if tokenElement not in data_relations.iloc[:, 0].tolist():
                                 data_relations = data_relations.append({
@@ -185,12 +187,14 @@ if __name__ == '__main__':
                                 }, ignore_index=True)
                             else:
                                 update_index = pd.Index(data_relations.iloc[:, 0].tolist()).get_loc(tokenElement)
-                                data_relations.loc[update_index, "Counts"] += 1
+                                data_relations.iloc[update_index, 1] += 1
 
-                    if len(data_entities) % 500 == 0:
+                    if lineCount % 5000 == 0:
+                        data_entities.sort_values(by=["Counts"], ascending=False, inplace=True)
+                        data_relations.sort_values(by=["Counts"], ascending=False, inplace=True)
                         data_entities.to_csv(RESULT_SAVING_DIR + "entity_result.csv", sep=",", mode="w", index=False)
                         data_relations.to_csv(RESULT_SAVING_DIR + "relations_result.csv", sep=",", mode="w", index=False)
-                    elif psutil.virtual_memory()[4] < 1000000000:
+                    elif psutil.virtual_memory()[4] < 2000000000 or lineCount % 10500 == 0:
                         data_entities = data_entities[data_entities["Counts"] > 1]
                         data_relations = data_relations[data_relations["Counts"] > 1]
 
