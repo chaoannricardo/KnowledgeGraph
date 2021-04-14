@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+from tqdm import tqdm
 import codecs
 import monpa
 import os
@@ -37,9 +38,9 @@ def create_user_dict(TOKEN_DIR, threshold=1):
 
 if __name__ == '__main__':
     # configurations
-    TOKEN_DIR = ""
-    RESULT_SAVING_DIR = ""
-    DATA_IMPORT_DIR = ""
+    TOKEN_DIR = "../../../results_kg/210415_result/entity_and_relations/"
+    RESULT_SAVING_DIR = "../../../results_kg/210415_result/word2vec_dataset/"
+    DATA_IMPORT_DIR = "../../../data_kg/data_wikipedia_xml_clean/"
     STOP_WORD_DIR = "../stopwords/"
 
     # MONPA
@@ -73,7 +74,7 @@ if __name__ == '__main__':
 
     stopword_list = list(dict.fromkeys(stopword_list))
 
-    for fileIndex, fileElement in enumerate(os.listdir(DATA_IMPORT_DIR)):
+    for fileIndex, fileElement in enumerate(tqdm(os.listdir(DATA_IMPORT_DIR))):
         file = codecs.open(DATA_IMPORT_DIR + fileElement, 'r', encoding='utf8', errors='ignore')
         fileExport = codecs.open(RESULT_SAVING_DIR + fileElement, 'w', encoding='utf8', errors='ignore')
 
@@ -83,11 +84,44 @@ if __name__ == '__main__':
             textList = re.split(pattern, textElement)
             # start pseg text
             for subIndex, subElement in enumerate(textList):
-                result_list = monpa.cut(subElement)
-                if len(result_list) > 0:
-                    for resultIndex, resultElement in enumerate(result_list):
-                        if resultElement not in stopword_list and len(resultElement) <= 6:
-                            fileExport.write(str(resultElement) + " ")
+                cutElements = []
+                cutPOSs = []
+                cutResult = monpa.pseg(subElement)
+                if len(cutResult) > 0:
+                    # append entity and pos seperately
+                    for cutIndex, cutElement in enumerate(cutResult):
+                        cutElements.append(cutElement[0])
+                        cutPOSs.append(cutElement[1])
+                    # eliminate entity between two brackets
+                    for elementIndex, element in enumerate(cutElements):
+                        # delete elements that's between two bracket
+                        if cutElements[elementIndex] in bracket_entity_list_first:
+                            left_bracket_index = bracket_entity_list_first.index(cutElements[elementIndex])
+                            findingLimit = (elementIndex + 11) if (elementIndex + 11) <= (len(cutElements)) else len(
+                                cutElements)
+                            for findingLeftIndex in range(elementIndex + 1, findingLimit):
+                                if cutElements[findingLeftIndex] == bracket_entity_list_last[left_bracket_index]:
+                                    for removalIndex in range(elementIndex, findingLeftIndex + 1):
+                                        cutElements[removalIndex] = ""
+                                    break
+                        elif element in punct_entity_list:
+                            cutElements[elementIndex] = ""
+                        elif cutResult[elementIndex][1] in splitter_pos_list or cutResult[elementIndex][
+                            0] in sentences_splitter:
+                            # appending subsentences
+                            cutElements[elementIndex] = ""
+                            subCutElements = cutElements[:elementIndex]
+                            subCutElements = list(filter(("").__ne__, subCutElements))
+                            for appendingIndex in range(0, elementIndex):
+                                cutElements[appendingIndex] = ""
+                    cutElements = list(filter(("").__ne__, cutElements))
+
+                    # write to file
+                    for elementIndex, cutElement in enumerate(cutElements):
+                        if cutElement not in stopword_list:
+                            fileExport.write(cutElement + " ")
+
                     fileExport.write("\n")
                 else:
                     continue
+        fileExport.close()

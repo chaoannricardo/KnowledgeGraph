@@ -13,7 +13,7 @@ import warnings
 if __name__ == '__main__':
     # configurations
     warnings.filterwarnings("ignore")
-    RESULT_SAVING_DIR = "../../../results_kg/210415_result/"
+    RESULT_SAVING_DIR = "../../../results_kg/210415_result/tokens_splitted/"
     DATA_IMPORT_DIR = "../../../data_kg/data_wikipedia_xml_clean/"
     STOP_WORD_DIR = "../stopwords/"
     USER_DICT_PATH = ""
