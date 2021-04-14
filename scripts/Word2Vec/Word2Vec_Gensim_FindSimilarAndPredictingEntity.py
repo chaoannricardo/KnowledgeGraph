@@ -10,8 +10,8 @@ print(model.wv.similarity("晶圓", "價值"))
 '''
 if __name__ == '__main__':
     # configurations
-    ENTITY_LOAD_PATH = "../../results/210408_result/210408_dataset_entity_result_MONPA.csv"
-    MODEL_PATH = "../../models/210408_word2vec.model"
+    ENTITY_LOAD_PATH = "../../../results/210408_result/210408_dataset_entity_result_MONPA.csv"
+    MODEL_PATH = "../../models/210415_gensim_CBOW_1.model"
     SAVE_FILE_PATH = "../../results/210408_result/210408_dataset_word2vec_center_prediction.csv"
 
     # process starts
