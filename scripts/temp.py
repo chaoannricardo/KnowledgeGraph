@@ -1,6 +1,32 @@
-if __name__ == '__main__':
-    file = open("./stopwords/numbers.txt", mode="w")
-    for index in range(-100000, 100000):
-        file.write(str(index) + "\n")
+# -*- coding: utf8 -*-
+from nltk import Tree
+import spacy
 
-file.close()
+
+def to_nltk_tree(node):
+    if node.n_lefts + node.n_rights > 0:
+        return Tree(node.orth_, [to_nltk_tree(child) for child in node.children])
+    else:
+        return node.orth_
+
+
+if __name__ == '__main__':
+    allWords = []
+    allFlags = []
+    allDep = []
+
+    text = "晶圓代工廠商的先進製程競賽如火如荼來到7nm，但也有晶圓代工廠商就此打住，聯電將止於12nm製程研發，GlobalFoundries宣告無限期停止7nm及以下先進製程發展。"
+
+    nlp = spacy.load("zh_core_web_trf")
+    doc = nlp(text)
+
+    for token in doc:
+        allWords.append(token.text)
+        allFlags.append(token.pos_)
+        allDep.append(token.dep_)
+
+    print(allWords)
+    print(allFlags)
+    print(allDep)
+
+    print([to_nltk_tree(sent.root).pretty_print() for sent in doc.sents])
