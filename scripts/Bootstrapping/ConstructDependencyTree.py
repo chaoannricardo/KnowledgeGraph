@@ -1,4 +1,12 @@
 # -*- coding: utf8 -*-
+"""
+Reference: https://stackoverflow.com/questions/36610179/how-to-get-the-dependency-tree-with-spacy
+
+Other Reference related to dependency graph construction:
+* https://reurl.cc/E20jgK
+* https://spacy.io/api/dependencyparser
+* https://spacy.io/usage/visualizers
+"""
 from nltk import Tree
 import spacy
 
