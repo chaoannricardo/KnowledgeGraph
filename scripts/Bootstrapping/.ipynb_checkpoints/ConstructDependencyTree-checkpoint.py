@@ -6,8 +6,6 @@ Other Reference related to dependency graph construction:
 * displaCy Dependency Visualizer Online: https://reurl.cc/E20jgK
 * https://spacy.io/api/dependencyparser
 * https://spacy.io/usage/visualizers
-
-spacy.displacy.serve(doc, style='dep')
 """
 from nltk import Tree
 import spacy
