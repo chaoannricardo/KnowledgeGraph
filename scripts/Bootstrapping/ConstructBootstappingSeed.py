@@ -1,4 +1,9 @@
 # -*- coding: utf8 -*-
+"""
+Reference:
+* https://towardsdatascience.com/how-to-find-shortest-dependency-path-with-spacy-and-stanfordnlp-539d45d28239
+
+"""
 from nltk import Tree
 import networkx as nx
 import re
@@ -24,4 +29,3 @@ def find_element_nested_list(element, list_source, index_list, index="start"):
 
 if __name__ == '__main__':
     SEED_OUTPUT_PATH = ""
-    
