@@ -79,7 +79,7 @@ if __name__ == '__main__':
                 edges_and_dependencies.append(('{0}'.format((token.lower_, token.dep_)),
                                                '{0}'.format((child.lower_, child.dep_))))
 
-            # append data for graph searchin
+            # append data for graph searching
             edges_list.append(str(token))
             dependencies_list.append(token.dep_)
 
