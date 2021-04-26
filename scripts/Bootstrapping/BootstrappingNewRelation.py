@@ -197,7 +197,7 @@ if __name__ == '__main__':
                                 is_predicate_same = False
                                 difference = 0
                                 for testingIndex, testingElement in enumerate(basic_output_list):
-                                    if testingIndex == 0 or (len(basic_output_list) - 1):
+                                    if testingIndex == 0 or testingIndex == (len(basic_output_list) - 1):
                                         continue
                                     else:
                                         if testingIndex != predicate_index and testingElement != seedRelation[testingIndex]:
@@ -211,6 +211,9 @@ if __name__ == '__main__':
                                     second_phase_relation_list.append(output_list)
                                 elif difference == 1 and is_predicate_same is not True:
                                     third_phase_relation_list.append(output_list)
+                                else:
+                                    # print(difference, is_predicate_same)
+                                    pass
 
 
 
