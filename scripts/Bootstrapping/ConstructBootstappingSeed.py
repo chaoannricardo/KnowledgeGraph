@@ -33,24 +33,32 @@ if __name__ == '__main__':
     ''' Configurations '''
     SEED_RELATION_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
     SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION.csv"
+    BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"
     WHOLE_RESULT_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_WHOLE.csv"
     TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
     SPACY_ENGINE_TYPE = "zh_core_web_trf"  # "zh_core_web_sm" "en_core_web_sm"
     ''' Process Starts '''
     file_import = codecs.open(SEED_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
     file_export = codecs.open(SEED_OUTPUT_PATH, mode="w", encoding="utf8")
+    file_export_basic = codecs.open(BASIC_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     file_export_whole = codecs.open(WHOLE_RESULT_OUTPUT_PATH, mode="w", encoding="utf8")
     file_trigger_word = codecs.open(TRIGGER_WORD_OUTPUT_PATH, mode="w", encoding="utf8")
     nlp = spacy.load(SPACY_ENGINE_TYPE)
+
+    trigger_word_list = []
 
     for lineIndex, line in enumerate(tqdm(file_import.readlines())):
         if lineIndex == 0:
             continue
 
-        text = line.split("|")[0]
-        object_name = line.split("|")[1]
-        predicate = line.split("|")[2]
-        subject = line.split("|")[3]
+        # for debugging
+        # if lineIndex == 100:
+        #     break
+
+        text = line.split("●")[0]
+        object_name = line.split("●")[1]
+        predicate = line.split("●")[2]
+        subject = line.split("●")[3][:-1]
 
         # Load spacy's dependency tree into a networkx graph
         edges = []
@@ -77,7 +85,7 @@ if __name__ == '__main__':
             dependencies_list.append(token.dep_)
 
         # check if object, subject, predicate are inside tokens
-        if object_name not in edges_list or subject not in edges_list or predicate not in edges_list:
+        if (object_name not in edges_list) or (subject not in edges_list) or (predicate not in edges_list):
             continue
 
         # construct graph by networkx
@@ -96,36 +104,69 @@ if __name__ == '__main__':
                 predicate_index.append(index)
 
         shortest_path_list = []  # initiate object to prevent warnings
+        predicate_index_list = []
         if len(object_index) == len(subject_index) == len(predicate_index) == 1:
-            e_1 = "(\'" + str(edges_list[object_index[0]]) + "\', \'" + dependencies_list[object_index[0]] + "\')"
-            e_2 = "(\'" + str(edges_list[subject_index[0]]) + "\', \'" + dependencies_list[subject_index[0]] + "\')"
-            e_3 = "(\'" + str(edges_list[predicate_index[0]]) + "\', \'" + dependencies_list[predicate_index[0]] + "\')"
-            shortest_path_list = nx.shortest_path(graph_test, source=e_1, target=e_3) + nx.shortest_path(graph_test,
-                                                                                                         source=e_3,
-                                                                                                         target=e_2)[1:]
-            result_list.append(shortest_path_list)
+            try:
+                e_1 = "(\'" + str(edges_list[object_index[0]]) + "\', \'" + dependencies_list[object_index[0]] + "\')"
+                e_2 = "(\'" + str(edges_list[subject_index[0]]) + "\', \'" + dependencies_list[subject_index[0]] + "\')"
+                e_3 = "(\'" + str(edges_list[predicate_index[0]]) + "\', \'" + dependencies_list[
+                    predicate_index[0]] + "\')"
+                shortest_path_list = nx.shortest_path(graph_test, source=e_1, target=e_3) + nx.shortest_path(graph_test,
+                                                                                                             source=e_3,
+                                                                                                             target=e_2)[
+                                                                                            1:]
+                predicate_index_list.append(len(nx.shortest_path(graph_test, source=e_1, target=e_3)) - 1)
+                result_list.append(shortest_path_list)
+            except (nx.exception.NetworkXNoPath, nx.exception.NodeNotFound):
+                pass
         else:
             for indexA in object_index:
                 for indexB in subject_index:
                     for indexC in predicate_index:
-                        e_1 = "(\'" + str(edges_list[indexA]) + "\', \'" + dependencies_list[indexA] + "\')"
-                        e_2 = "(\'" + str(edges_list[indexB]) + "\', \'" + dependencies_list[indexB] + "\')"
-                        e_3 = "(\'" + str(edges_list[indexC]) + "\', \'" + dependencies_list[indexC] + "\')"
-                        shortest_path_list = nx.shortest_path(graph_test, source=e_1, target=e_2)[1:]
-                        result_list.append(shortest_path_list)
+                        try:
+                            e_1 = "(\'" + str(edges_list[indexA]) + "\', \'" + dependencies_list[indexA] + "\')"
+                            e_2 = "(\'" + str(edges_list[indexB]) + "\', \'" + dependencies_list[indexB] + "\')"
+                            e_3 = "(\'" + str(edges_list[indexC]) + "\', \'" + dependencies_list[indexC] + "\')"
+                            shortest_path_list = nx.shortest_path(graph_test, source=e_1,
+                                                                  target=e_3) + nx.shortest_path(
+                                graph_test,
+                                source=e_3,
+                                target=e_2)[1:]
+                            predicate_index_list.append(len(nx.shortest_path(graph_test, source=e_1, target=e_3)) - 1)
+                            result_list.append(shortest_path_list)
+                        except (nx.exception.NetworkXNoPath, nx.exception.NodeNotFound):
+                            pass
 
         # export seed result to file
         for resultIndex, resultElement in enumerate(result_list):
             root_included = False
             output_list = []
-            for elementIndex, element in enumerate(shortest_path_list):
-                if elementIndex not in [0, len(shortest_path_list) - 1]:
-                    output_list.append(re.split("\'", element)[3])
-                else:
-                    if root_included:
-                        output_list.append(re.split("\'", element)[3])
+            for elementIndex, element in enumerate(resultElement):
+                # edge name: re.split("\'", element)[1]
+                # dependency type: re.split("\'", element)[3]
+                if elementIndex in [0, predicate_index_list[resultIndex]]:
                     output_list.append(re.split("\'", element)[1])
+                    output_list.append(re.split("\'", element)[3])
+                elif elementIndex == (len(resultElement) - 1):
+                    output_list.append(re.split("\'", element)[1])
+                else:
+                    if re.split("\'", element)[3] == "ROOT":
+                        root_included = True
+                        output_list.append(re.split("\'", resultElement[elementIndex + 1])[3])
+                    else:
+                        if root_included:
+                            output_list.append(re.split("\'", resultElement[elementIndex + 1])[3])
+                        else:
+                            output_list.append(re.split("\'", element)[3])
 
-            file_export.write("|".join(output_list) + "\n")
-            file_export_whole.write("+".join(resultElement) + "\n")
-            file_trigger_word.write(predicate + ",")
+            basic_output_list = output_list.copy()
+            basic_output_list[0] = "Entity"
+            basic_output_list[-1] = "Entity"
+
+            file_export.write("@".join(output_list) + "\n")
+            file_export_basic.write("@".join(basic_output_list) + "&" + predicate + "\n")
+            file_export_whole.write("@".join(resultElement) + "\n")
+            trigger_word_list.append(predicate)
+
+    trigger_word_list = list(set(trigger_word_list))
+    file_trigger_word.write(",".join(trigger_word_list))

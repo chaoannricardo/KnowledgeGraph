@@ -27,7 +27,7 @@ if __name__ == '__main__':
                 predicate = relation["predicate"]
                 object = relation["object"]["@value"]
                 subject = relation["subject"]
-                file_export.write("|".join([line_dict["text"], object, predicate, subject]) + "\n")
+                file_export.write("●".join([line_dict["text"], object, predicate, subject]) + "\n")
 
 
 
