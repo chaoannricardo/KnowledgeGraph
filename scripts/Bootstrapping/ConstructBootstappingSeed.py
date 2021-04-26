@@ -4,7 +4,6 @@ Reference:
 * https://towardsdatascience.com/how-to-find-shortest-dependency-path-with-spacy-and-stanfordnlp-539d45d28239
 
 """
-from nltk import Tree
 from tqdm import tqdm
 import codecs
 import networkx as nx
