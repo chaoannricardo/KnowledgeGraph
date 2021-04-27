@@ -2,6 +2,8 @@
 """
 Reference:
 * https://towardsdatascience.com/how-to-find-shortest-dependency-path-with-spacy-and-stanfordnlp-539d45d28239
+* https://stackoverflow.com/questions/32835291/how-to-find-the-shortest-dependency-path-between-two-words-in-python
+* https://networkx.org/documentation/stable/reference/algorithms/shortest_paths.html
 
 """
 from tqdm import tqdm
