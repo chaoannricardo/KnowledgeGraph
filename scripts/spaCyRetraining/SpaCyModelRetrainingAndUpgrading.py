@@ -47,8 +47,8 @@ if __name__ == '__main__':
 
     ''' Process Starts '''
     data_import = codecs.open(TRAIN_DATA_PATH, mode="r", encoding="utf8", errors="ignore")
-    # TRAIN_DATA = []
-    TRAIN_DATA = {}
+    TRAIN_DATA = []
+    DATA_DICT = {}
     for lineIndex, line in enumerate(data_import.readlines()[:100]):
         if lineIndex == 0:
             continue
@@ -71,15 +71,15 @@ if __name__ == '__main__':
                         end_index = (stringIndex + len(splitElement.replace("\n", "")))
                         break
                 # append value into training data list
-                # TRAIN_DATA.append((lineElementList[0], {'entities': [(start_index, end_index, "RELATION_ENTITY")]}))
-                TRAIN_DATA[splitElement.replace("\n",  "")] = np.random.uniform(-1, 1, (300,))
+                TRAIN_DATA.append((lineElementList[0], {'entities': [(start_index, end_index, "RELATION_ENTITY")]}))
+                DATA_DICT[splitElement.replace("\n",  "")] = np.random.uniform(-1, 1, (300,))
 
     # print(TRAIN_DATA)
 
     nlp = spacy.load("zh_core_web_trf")
 
     vocab = nlp.vocab
-    for word, vector in TRAIN_DATA.items():
+    for word, vector in DATA_DICT.items():
         vocab.set_vector(word, vector)
 
     ''' Time Recoder '''
@@ -92,35 +92,34 @@ if __name__ == '__main__':
                    u"bot": np.random.uniform(-1, 1, (300,)),
                    u"nugget": np.random.uniform(-1, 1, (300,))}
 
-    # for epoch in range(EPOCH):
-    #     # 随机化训练数据的顺序
-    #     losses = {}
-    #     if SHUFFLE:
-    #         random.shuffle(TRAIN_DATA)
-    #     # 创建批次并遍历
-    #     for batch in spacy.util.minibatch(TRAIN_DATA, size=100):
-    #         for text, annotations in batch:
-    #             # create Example
-    #             doc = nlp.make_doc(text)
-    #             '''
-    #             tackle if our entity does not match the tokenizer
-    #             Reference:
-    #             * https://github.com/explosion/spaCy/discussions/6979
-    #             * https://github.com/explosion/spaCy/issues/5727
-    #             '''
-    #             span = doc.char_span(annotations["entities"][0][0], annotations["entities"][0][1],
-    #                                  label=annotations["entities"][0][2], alignment_mode="expand")
-    #             adjusted_start_char = span.start_char
-    #             adjusted_end_char = span.end_char
-    #             '''  tacking part ended '''
-    #             example = Example.from_dict(doc, annotations)
-    #             # Update the model
-    #             nlp.update([example], losses=losses, drop=0.3)
-    #
-    #     print("Epoch:", epoch + 1, "Loss:", losses)
+    for epoch in range(EPOCH):
+        # shuffle training data
+        losses = {}
+        if SHUFFLE:
+            random.shuffle(TRAIN_DATA)
+        # 创建批次并遍历
+        for batch in spacy.util.minibatch(TRAIN_DATA, size=100):
+            for text, annotations in batch:
+                # create Example
+                doc = nlp.make_doc(text)
+                '''
+                tackle if our entity does not match the tokenizer
+                Reference:
+                * https://github.com/explosion/spaCy/discussions/6979
+                * https://github.com/explosion/spaCy/issues/5727
+                '''
+                span = doc.char_span(annotations["entities"][0][0], annotations["entities"][0][1],
+                                     label=annotations["entities"][0][2], alignment_mode="expand")
+                adjusted_start_char = span.start_char
+                adjusted_end_char = span.end_char
+                '''  tacking part ended '''
+                example = Example.from_dict(doc, annotations)
+                # Update the model
+                nlp.update([example], losses=losses, drop=0.3)
 
-    # 保存模型
+        print("Epoch:", epoch + 1, "Loss:", losses)
 
+    # save model to path
     nlp.to_disk(MODEL_SAVE_PATH)
 
     ''' Time Recoder '''
