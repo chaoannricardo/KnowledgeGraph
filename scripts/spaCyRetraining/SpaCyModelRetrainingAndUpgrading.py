@@ -4,6 +4,9 @@ This is a sample script to construct spaCy 3.0 training data from spaCy 2.0 form
 
 Reference:
 * https://towardsdatascience.com/using-spacy-3-0-to-build-a-custom-ner-model-c9256bea098
+* https://stackoverflow.com/questions/66675261/how-can-i-work-with-example-for-nlp-update-problem-with-spacy3-0
+* https://blog.csdn.net/peacefairy/article/details/110528012 (Fixing Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized)
+* https://stackoverflow.com/questions/44096479/how-to-create-dictionary-for-spacy-nlp
 """
 
 import pandas as pd
@@ -19,9 +22,9 @@ if __name__ == '__main__':
     ''' Configurations '''
     LANGUAGE_TYPE = "zh"
     TRAIN_DATA_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
-    EPOCH = 20
+    EPOCH = 100
     SHUFFLE = False
-    MODEL_SAVE_PATH = "../../../KnowledgeGraph_materials/model_kg/210506_spacy_model"
+    MODEL_SAVE_PATH = "../../../KnowledgeGraph_materials/models_kg/210506_spacy_model"
     spacy.prefer_gpu()
     '''
     # following is spaCy 2.0 training data format
@@ -72,9 +75,11 @@ if __name__ == '__main__':
 
     nlp = spacy.load("zh_core_web_trf")
 
+    ''' Time Recoder '''
     datetimeFormat = '%Y-%m-%d %H:%M:%S.%f'
     start_training_time = str(datetime.datetime.now())
     print("Based model loaded, start training the model at \n", start_training_time)
+    ''' Time Recoder Ended '''
 
     for epoch in range(EPOCH):
         # 随机化训练数据的顺序
@@ -104,10 +109,15 @@ if __name__ == '__main__':
         print("Epoch:", epoch + 1, "Loss:", losses)
 
     # 保存模型
+
+    nlp.to_disk(MODEL_SAVE_PATH)
+
+    ''' Time Recoder '''
     ending_time = str(datetime.datetime.now())
     time_diff = datetime.datetime.strptime(ending_time, datetimeFormat) - \
                 datetime.datetime.strptime(start_training_time, datetimeFormat)
     print("Start training the model at \n", start_training_time)
     print("Training finished at \n", datetime.datetime.now())
     print("Time spent:\n", time_diff)
-    nlp.to_disk(MODEL_SAVE_PATH)
+    ''' Time Recoder Ended '''
+
