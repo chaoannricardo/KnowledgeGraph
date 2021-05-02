@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 """
-This is a sample script to construct spaCy 3.0 training data from spaCy 2.0 format
+Warning: The script is not usable and may not update model correctly due to some technical problem
+This is a sample script to construct spaCy 3.0 training data from spaCy 2.0 format, and update existing model
 
 Reference:
 * https://towardsdatascience.com/using-spacy-3-0-to-build-a-custom-ner-model-c9256bea098

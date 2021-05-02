@@ -1,0 +1,10 @@
+https://course.spacy.io/zh/chapter4
+https://stackoverflow.com/questions/66063616/train-custom-ner-component-with-a-base-model-in-spacy-v3
+https://stackoverflow.com/questions/66090423/spacy-v3-train-ner-based-on-existing-model-or-add-custom-trained-ner-to-existing
+https://github.com/explosion/spaCy/discussions/7149
+https://www.machinelearningplus.com/nlp/training-custom-ner-model-in-spacy/
+https://zhuanlan.zhihu.com/c_1350547842193342464
+https://github.com/explosion/spaCy/issues/6267
+https://github.com/explosion/spaCy/issues/3967
+https://stackoverflow.com/questions/65220447/add-new-named-entity-to-spacys-en-core-web-sm-model
+https://towardsdatascience.com/using-spacy-3-0-to-build-a-custom-ner-model-c9256bea098

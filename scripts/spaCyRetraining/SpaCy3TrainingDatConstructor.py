@@ -37,7 +37,7 @@ if __name__ == '__main__':
     ''' Process Starts '''
     data_import = codecs.open(TRAIN_DATA_PATH, mode="r", encoding="utf8", errors="ignore")
     TRAIN_DATA = []
-    for lineIndex, line in enumerate(data_import.readlines()):
+    for lineIndex, line in enumerate(data_import.readlines()[:100]):
         if lineIndex == 0:
             continue
 
