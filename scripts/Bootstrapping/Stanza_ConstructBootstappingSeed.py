@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     trigger_word_list = []
 
-    for lineIndex, line in enumerate(tqdm(file_import.readlines()[:100])):
+    for lineIndex, line in enumerate(tqdm(file_import.readlines()[:1000])):
         if lineIndex == 0:
             continue
 
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                     basic_output_list = edges.copy()
                     basic_output_list[0] = "Entity"
                     basic_output_list[-1] = "Entity"
-                    basic_output_list[predicateIndex] = "Predicate"
+                    # basic_output_list[predicateIndex] = "Predicate"
 
                     file_export.write("@".join(edges) + "\n")
                     file_export_basic.write("@".join(basic_output_list) + "&" + predicate + "\n")
