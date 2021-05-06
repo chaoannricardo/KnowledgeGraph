@@ -36,6 +36,11 @@ if __name__ == '__main__':
         'depparse_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/depparse/gsd.pt',
         'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
     }
+    REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
+                    "＞", "〕", "】", "〗", "》", "〉"]
+    PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
+    NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
+    TOLERATE_DIFFERENCE = 3
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -72,27 +77,31 @@ if __name__ == '__main__':
 
     ''' bootstrapping starts '''
     first_phase_relation_list = []
+    first_phase_relation_list_whole = []
     second_phase_relation_list = []
+    second_phase_relation_list_whole = []
     third_phase_relation_list = []
+    third_phase_relation_list_whole = []
 
     for lineIndex, line in enumerate(tqdm([line.replace("\r\n", "") for line in data_import.readlines()])):
 
-        # debugging code
+        ''' debugging code '''
         if lineIndex == 100:
         # if lineIndex == len([line.replace("\r\n", "") for line in data_import.readlines()]) - 1:
-            first_phase_relation_list.sort()
-            first_phase_relation_list = list(k for k, _ in itertools.groupby(first_phase_relation_list))
-            second_phase_relation_list.sort()
-            second_phase_relation_list = list(k for k, _ in itertools.groupby(second_phase_relation_list))
-            third_phase_relation_list.sort()
-            third_phase_relation_list = list(k for k, _ in itertools.groupby(third_phase_relation_list))
+            first_phase_relation_list_whole.sort()
+            first_phase_relation_list_whole = list(k for k, _ in itertools.groupby(first_phase_relation_list_whole))
+            second_phase_relation_list_whole.sort()
+            second_phase_relation_list_whole = list(k for k, _ in itertools.groupby(second_phase_relation_list_whole))
+            third_phase_relation_list_whole.sort()
+            third_phase_relation_list_whole = list(k for k, _ in itertools.groupby(third_phase_relation_list_whole))
 
-            print(first_phase_relation_list)
+            print((first_phase_relation_list_whole))
             print("++++++++++++++++++++++++++++++++++++++++++++")
-            print(second_phase_relation_list)
+            print((second_phase_relation_list_whole))
             print("++++++++++++++++++++++++++++++++++++++++++++")
-            print(third_phase_relation_list)
+            print((third_phase_relation_list_whole))
             break
+        ''' debigging code finished '''
 
         ''' Special line to eliminate years for data '''
         try:
@@ -112,7 +121,30 @@ if __name__ == '__main__':
         e_3_index = []
         e_3_neglect = []
         pos_list = []
-        output_list = []
+
+        ''' Preprocessing of text line '''
+        # replace special chars in line
+        for charIndex, charElement in enumerate(REPLACE_CHAR):
+            line = line.replace(charElement, "，")
+
+        for charIndex, charElement in enumerate(NEGLECT_CAHR):
+            line = line.replace(charElement, "")
+
+        if line[0] == "，":
+            line = line[1:]
+
+        line_split = [line[i] for i in range(len(line))]
+        for charIndex, charElement in enumerate(line_split):
+            if (charIndex + 1) == len(line):
+                continue
+            if charElement in PUNT_CHAR and line_split[charIndex + 1] in PUNT_CHAR:
+                line_split[charIndex] = ""
+
+        line = "".join(line_split)
+        if line[-1] in PUNT_CHAR:
+            line = line[:-1]
+
+        ''' ended '''
 
         doc = nlp(line)
         includeObject = False
@@ -219,7 +251,7 @@ if __name__ == '__main__':
                         basic_output_list[0] = "Entity"
                         basic_output_list[-1] = "Entity"
                         basic_output_list_no_trigger[0] = "Entity"
-                        basic_output_list_no_trigger[-1]= "Entity"
+                        basic_output_list_no_trigger[-1] = "Entity"
                         basic_output_list_no_trigger[predicate_index_list[resultIndex] + 1] = "Predicate"
 
                         # print(basic_output_list_no_trigger)
@@ -228,9 +260,11 @@ if __name__ == '__main__':
 
                         ''' First Phase - all but entities are same '''
                         if basic_output_list in seed_relation_list:
-                            first_phase_relation_list.append(output_list)
+                            first_phase_relation_list.append(basic_output_list)
+                            first_phase_relation_list_whole.append(edges)
 
                         predicate_index = (predicate_index_list[resultIndex] + 1)
+
                         for seedIndex, seedRelation in enumerate(seed_relation_list):
                             if len(seedRelation) == len(basic_output_list):
                                 is_predicate_same = False
@@ -247,13 +281,17 @@ if __name__ == '__main__':
 
                                 ''' Second Phase - one of dependencies is different '''
                                 ''' Third Phase - trigger word is different '''
-                                if difference == 2 and is_predicate_same:
-                                    second_phase_relation_list.append(output_list)
-                                elif difference == 2 and is_predicate_same is not True:
-                                    third_phase_relation_list.append(output_list)
+                                # print(difference)
+                                if difference <= TOLERATE_DIFFERENCE and is_predicate_same:
+                                    second_phase_relation_list.append(basic_output_list)
+                                    second_phase_relation_list_whole.append(edges)
+                                elif difference == TOLERATE_DIFFERENCE and is_predicate_same is not True:
+                                    third_phase_relation_list.append(basic_output_list)
+                                    third_phase_relation_list_whole.append(edges)
                                 else:
                                     # print(difference, is_predicate_same)
                                     pass
+
 
 
 

@@ -11,7 +11,7 @@ if __name__ == '__main__':
     OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
     REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">", "＞", "〕", "】", "〗", "》", "〉"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
-    NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
+    NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?", "－"]
     ''' Process Starts '''
     file_import = codecs.open(JSON_PATH, mode="r", encoding="utf8", errors="ignore")
     file_export = codecs.open(OUTPUT_PATH, mode="w", encoding="utf8")
@@ -47,6 +47,9 @@ if __name__ == '__main__':
                         line_split[charIndex] = ""
 
                 line = "".join(line_split)
+                if line[-1] in PUNT_CHAR:
+                    line = line[:-1]
+
                 predicate = relation["predicate"]
                 object = relation["object"]["@value"]
                 subject = relation["subject"]
