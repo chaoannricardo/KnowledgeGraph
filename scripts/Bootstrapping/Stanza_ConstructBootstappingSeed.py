@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     trigger_word_list = []
 
-    for lineIndex, line in enumerate(tqdm(file_import.readlines()[:1000])):
+    for lineIndex, line in enumerate(tqdm(file_import.readlines()[:5000])):
         if lineIndex == 0:
             continue
 
