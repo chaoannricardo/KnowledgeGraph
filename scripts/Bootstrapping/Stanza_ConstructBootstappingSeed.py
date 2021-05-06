@@ -22,7 +22,7 @@ if __name__ == '__main__':
     TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
-        'lang': 'zh',  # Language code for the language to build the Pipeline in
+        'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
         'tokenize_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/tokenize/gsd.pt',
         # Processor-specific arguments are set with keys "{processor_name}_{argument_name}"
         'pos_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pos/gsd.pt',
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     trigger_word_list = []
 
-    for lineIndex, line in enumerate(tqdm(file_import.readlines()[:5000])):
+    for lineIndex, line in enumerate(tqdm(file_import.readlines()[:10000])):
         if lineIndex == 0:
             continue
 

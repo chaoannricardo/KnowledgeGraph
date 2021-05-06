@@ -4,6 +4,9 @@
 Reminder:
 Remember to remove special line while changing datasource.
 
+Reference:
+* https://stackoverflow.com/questions/57078311/load-stanfordnlp-model-locally
+
 """
 from tqdm import tqdm
 import codecs
@@ -16,7 +19,7 @@ import stanza
 
 if __name__ == '__main__':
     ''' Configurations '''
-    BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"  # seed dictionary constructed by former script
+    BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
     OBJECT_DICT_PATH = "../../../KnowledgeGraph_materials/data_kg/NationNamesMandarin.txt"
     SUBJECT_DICT_PATH = ""  # not using subject dict path for now
     TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
@@ -27,7 +30,7 @@ if __name__ == '__main__':
     NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
-        'lang': 'zh',  # Language code for the language to build the Pipeline in
+        'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
         'tokenize_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/tokenize/gsd.pt',
         # Processor-specific arguments are set with keys "{processor_name}_{argument_name}"
         'pos_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pos/gsd.pt',
@@ -37,9 +40,11 @@ if __name__ == '__main__':
         'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
     }
     REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
-                    "＞", "〕", "】", "〗", "》", "〉"]
+                    "＞", "〕", "】", "〗", "》", "〉", "。"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
     NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
+    NEGLECT_UPOS = ["PART", "PFA", "NUM"]
+    NEGLECT_XPOS = ["SFN"]
     TOLERATE_DIFFERENCE = 3
     ITERATIONS = 10
 
@@ -63,9 +68,9 @@ if __name__ == '__main__':
     # set up realtion and relation indexes for bootstrapping
     for lineIndex, line in enumerate(data_seed.readlines()):
         relation_line = line.split("&")[0]
-        relation_type = line.split("&")[1]
+        # relation_type = line.split("&")[1]
         seed_relation_list.append(relation_line)
-        relation_location_index.append(relation_line.split("@").index(relation_type.replace("\n", "")))
+        relation_location_index.append(relation_line.split("@").index("Predicate"))
 
     seed_relation_list = list(set(seed_relation_list))  # remove duplicate seed relations
     seed_relation_list = [seed_relation_list[i].split("@") for i in range(len(seed_relation_list))]
@@ -114,6 +119,8 @@ if __name__ == '__main__':
         nodes = []
         tokens = []
         ids = []
+        upos = []
+        xpos = []
         e_1_index = []
         e_1_neglect = []
         e_2_index = []
@@ -172,6 +179,8 @@ if __name__ == '__main__':
                 # append to create token list
                 tokens.append(word.text)
                 ids.append(word.id)
+                upos.append(word.upos)
+                xpos.append(word.xpos)
 
                 # check if token list include object list word
                 if str(word.text) in object_list:
@@ -182,11 +191,15 @@ if __name__ == '__main__':
             continue
 
         # get object index
-        object_index = 0
+        object_index = 99999
         for objectIndex, objectElement in enumerate(object_list):
             if objectElement in tokens:
                 object_index = tokens.index(objectElement)
+                print(tokens[object_index])
                 break
+
+        if object_index == 99999:
+            continue
 
         ''' Construct graph object for further processing '''
         # construct graph by networkx
@@ -199,11 +212,18 @@ if __name__ == '__main__':
                 predicate_index_list = []
                 result_list = []
 
-                if firstIndex == secondIndex or firstIndex == object_index or object_index == secondIndex:
+                if firstIndex == secondIndex or firstIndex == object_index or object_index == secondIndex or\
+                        len(str(tokens[int(firstElement) - 1])) < 2 or len(str(tokens[int(secondElement) - 1])) < 2 or\
+                        tokens[int(firstElement) - 1] in PUNT_CHAR or tokens[int(secondElement) - 1] in PUNT_CHAR or\
+                        upos[int(firstElement) - 1] in NEGLECT_UPOS or upos[int(secondElement) - 1] in NEGLECT_UPOS or\
+                        xpos[int(firstElement) - 1] in NEGLECT_XPOS or xpos[int(secondElement) - 1] in NEGLECT_XPOS:
                     # skip if element duplicate
+                    print("hi")
                     continue
                 else:
                     e_1 = str(ids[object_index])
+                    print("!!!", tokens[object_index])
+                    print("@@@", tokens[int(ids[object_index]) - 1])
                     e_1_pos = ""
                     e_2 = str(firstElement)
                     e_2_pos = ""
@@ -233,6 +253,7 @@ if __name__ == '__main__':
                     # construct output result
                     for resultIndex, resultElement in enumerate(result_list):
                         edges = [tokens[int(resultElement[0]) - 1]]
+                        print("@@@", tokens[int(resultElement[0]) - 1])
                         for path_index, path_element in enumerate(resultElement):
                             if path_index + 1 == len(resultElement):
                                 continue
@@ -246,6 +267,7 @@ if __name__ == '__main__':
                                     pass
 
                         edges.append(tokens[int(resultElement[-1]) - 1])
+
                         basic_output_list = edges.copy()
                         basic_output_list_no_trigger = edges.copy()
                         basic_output_list[0] = "Entity"
@@ -254,9 +276,8 @@ if __name__ == '__main__':
                         basic_output_list_no_trigger[-1] = "Entity"
                         basic_output_list_no_trigger[predicate_index_list[resultIndex] + 1] = "Predicate"
 
-                        # print(basic_output_list_no_trigger)
-                        # print(basic_output_list)
                         # print(edges)
+                        # print(basic_output_list)
 
                         ''' First Phase - all but entities are same '''
                         if basic_output_list in seed_relation_list:
@@ -281,17 +302,26 @@ if __name__ == '__main__':
 
                                 ''' Second Phase - one of dependencies is different '''
                                 ''' Third Phase - trigger word is different '''
-                                # print(difference)
                                 if difference <= TOLERATE_DIFFERENCE and is_predicate_same:
                                     second_phase_relation_list.append(basic_output_list)
                                     second_phase_relation_list_whole.append(edges)
-                                elif difference == TOLERATE_DIFFERENCE and is_predicate_same is not True:
+                                elif difference <= TOLERATE_DIFFERENCE and is_predicate_same is not True:
                                     third_phase_relation_list.append(basic_output_list)
                                     third_phase_relation_list_whole.append(edges)
                                 else:
                                     # print(difference, is_predicate_same)
                                     pass
+                        # print(len(third_phase_relation_list))
+                        # print(len(third_phase_relation_list_whole))
 
+    relation_whole_list = first_phase_relation_list_whole + second_phase_relation_list_whole + third_phase_relation_list_whole
+    relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
+
+    for relationIndex, relationElement in enumerate(relation_list):
+        seed_output_basic.write("@".join(relationElement) + "\n")
+
+    for relationIndex, relationElement in enumerate(relation_whole_list):
+        seed_output_whole.write("@".join(relationElement) + "\n")
 
 
 

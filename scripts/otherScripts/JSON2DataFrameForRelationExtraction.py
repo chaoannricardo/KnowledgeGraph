@@ -9,7 +9,7 @@ if __name__ == '__main__':
     ''' Configurations '''
     JSON_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTraditional/RelationExtraction/duie_train.json/duie_train.json"
     OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
-    REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">", "＞", "〕", "】", "〗", "》", "〉"]
+    REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">", "＞", "〕", "】", "〗", "》", "〉", "。"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
     NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?", "－"]
     ''' Process Starts '''

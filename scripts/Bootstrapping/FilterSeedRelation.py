@@ -5,11 +5,13 @@ import pandas as pd
 
 if __name__ == '__main__':
     SEED_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"
+    FILTER_SEED_EXPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"
 
-
+    # process start
     seed_pattern_list = []
 
     seed_basic = codecs.open(SEED_IMPORT_PATH, mode="r", encoding="utf8", errors="ignore")
+    seed_filter_export = codecs.open(FILTER_SEED_EXPORT_PATH, mode="w", encoding="utf8", errors="ignore")
 
     for seedIndex, seedElement in enumerate(seed_basic.readlines()):
         original_pattern = seedElement.split("&")[0]
@@ -22,12 +24,18 @@ if __name__ == '__main__':
         "SeedType": seed_pattern_list
     })
 
-    print(data_calculate["SeedType"].value_counts())
+    data_filter = data_calculate["SeedType"].value_counts().reset_index()
+    data_filter = data_filter[data_filter["SeedType"] >= 5].iloc[:, 0].tolist()
 
-    # print(len(data_calculate))
-    #
-    # print(len(data_calculate.drop_duplicates()))
-    # print(data_calculate.groupby("SeedType").count())
+    for lineIndex, lineElement in enumerate(data_filter):
+        seed_filter_export.write(lineElement + "\n")
+
+    # print(len(data_filter[data_filter["SeedType"] >= 5]))
+
+
+
+
+
 
 
 
