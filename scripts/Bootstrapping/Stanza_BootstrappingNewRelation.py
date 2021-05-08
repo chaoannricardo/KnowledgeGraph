@@ -40,11 +40,15 @@ if __name__ == '__main__':
         'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
     }
     REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
-                    "＞", "〕", "】", "〗", "》", "〉"]
+                    "＞", "〕", "】", "〗", "》", "〉", "\r\n"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
     NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
     NEGLECT_UPOS = ["PART", "PFA", "NUM"]
     NEGLECT_XPOS = ["SFN"]
+    NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
+    CONTINUE_WORD_UPOS = ["PROPN", "NOUN", "PART"]
+    CONTINUE_WORD_XPOS = []
+    CONTINUE_SEARCHING_LIMIT = 1
     TOLERATE_DIFFERENCE = 3
     ITERATIONS = 10
 
@@ -88,25 +92,13 @@ if __name__ == '__main__':
     third_phase_relation_list = []
     third_phase_relation_list_whole = []
 
-    for lineIndex, line in enumerate(tqdm([line.replace("\r\n", "") for line in data_import.readlines()])):
+    ''' Enumerate over file lines '''
+    for lineIndex, line in enumerate(tqdm(data_import.readlines())):
 
-        # ''' debugging code '''
+        ''' debugging part '''
         # if lineIndex == 100:
-        # # if lineIndex == len([line.replace("\r\n", "") for line in data_import.readlines()]) - 1:
-        #     first_phase_relation_list_whole.sort()
-        #     first_phase_relation_list_whole = list(k for k, _ in itertools.groupby(first_phase_relation_list_whole))
-        #     second_phase_relation_list_whole.sort()
-        #     second_phase_relation_list_whole = list(k for k, _ in itertools.groupby(second_phase_relation_list_whole))
-        #     third_phase_relation_list_whole.sort()
-        #     third_phase_relation_list_whole = list(k for k, _ in itertools.groupby(third_phase_relation_list_whole))
-        #
-        #     print((first_phase_relation_list_whole))
-        #     print("++++++++++++++++++++++++++++++++++++++++++++")
-        #     print((second_phase_relation_list_whole))
-        #     print("++++++++++++++++++++++++++++++++++++++++++++")
-        #     print((third_phase_relation_list_whole))
         #     break
-        # ''' debigging code finished '''
+        ''' ended '''
 
         ''' Special line to eliminate years for data '''
         try:
@@ -250,7 +242,27 @@ if __name__ == '__main__':
 
                         # construct output result
                         for resultIndex, resultElement in enumerate(result_list):
-                            edges = [tokens[int(resultElement[0]) - 1]]
+
+                            # append first token: check if entity is continued by nouns, if so, concat together
+                            first_token_index = int(resultElement[0]) - 1
+                            left_searching_limit = (first_token_index - CONTINUE_SEARCHING_LIMIT) if (first_token_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
+                            right_searching_limit = (first_token_index + CONTINUE_SEARCHING_LIMIT) if (first_token_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
+
+                            edges = [tokens[first_token_index]]
+
+                            # searching left
+                            for searchingIndex in range((first_token_index - 1), left_searching_limit, -1):
+                                if upos[first_token_index] not in NOUN_ENTITY_UPOS:
+                                    break
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS:
+                                    edges[0] = tokens[searchingIndex] + edges[0]
+
+                            # searching right
+                            for searchingIndex in range((first_token_index + 1),  right_searching_limit):
+                                if upos[first_token_index] not in NOUN_ENTITY_UPOS:
+                                    break
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS:
+                                    edges[0] = edges[0] + tokens[searchingIndex]
 
                             ''' debugging code '''
                             # print("@@@", tokens[int(resultElement[0]) - 1])
@@ -260,16 +272,62 @@ if __name__ == '__main__':
                                 if path_index + 1 == len(resultElement):
                                     continue
                                 else:
+                                    # appending predicate
                                     if path_index == predicate_index_list[resultIndex]:
-                                        edges.append(tokens[int(path_element) - 1])
+                                        predicate_location_in_edge = len(edges)
+                                        real_predicate_index = int(path_element) - 1
+                                        left_searching_limit = (real_predicate_index - CONTINUE_SEARCHING_LIMIT) if (real_predicate_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
+                                        right_searching_limit = (real_predicate_index + CONTINUE_SEARCHING_LIMIT) if (real_predicate_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
+
+                                        edges.append(tokens[real_predicate_index])
+
+                                        # searching left
+                                        for searchingIndex in range((real_predicate_index - 1), left_searching_limit, -1):
+                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS:
+                                                break
+                                            elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                                searchingIndex] in CONTINUE_WORD_UPOS:
+                                                edges[predicate_location_in_edge] = tokens[searchingIndex] + edges[predicate_location_in_edge]
+
+                                        # searching right
+                                        for searchingIndex in range((real_predicate_index + 1), right_searching_limit):
+                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS:
+                                                break
+                                            elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                                searchingIndex] in CONTINUE_WORD_UPOS:
+                                                edges[predicate_location_in_edge] = edges[predicate_location_in_edge] + tokens[searchingIndex]
+
+
+                                    # appending route
                                     route = path_element + "-" + resultElement[path_index + 1]
                                     try:
                                         edges.append(data_map[data_map["Route"] == route]["Edge"].iloc[0])
                                     except IndexError:
                                         pass
 
-                            edges.append(tokens[int(resultElement[-1]) - 1])
+                            # appending last entity
+                            last_token_index = int(resultElement[-1]) - 1
+                            left_searching_limit = (last_token_index - CONTINUE_SEARCHING_LIMIT) if (last_token_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
+                            right_searching_limit = (last_token_index + CONTINUE_SEARCHING_LIMIT) if (last_token_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
 
+                            edges.append(tokens[last_token_index])
+
+                            # searching left
+                            for searchingIndex in range((last_token_index - 1), left_searching_limit, -1):
+                                if upos[last_token_index] not in NOUN_ENTITY_UPOS:
+                                    break
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                    searchingIndex] in CONTINUE_WORD_UPOS:
+                                    edges[-1] = tokens[searchingIndex] + edges[-1]
+
+                            # searching right
+                            for searchingIndex in range((last_token_index + 1), right_searching_limit):
+                                if upos[last_token_index] not in NOUN_ENTITY_UPOS:
+                                    break
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS:
+                                    edges[-1] = edges[-1] + tokens[searchingIndex]
+
+                            # construct basic relation form
                             basic_output_list = edges.copy()
                             basic_output_list_no_trigger = edges.copy()
                             basic_output_list[0] = "Entity"
@@ -316,8 +374,20 @@ if __name__ == '__main__':
                             # print(len(third_phase_relation_list_whole))
                             ''' ended '''
 
-
     ''' Enumerate relations & export '''
+    first_phase_relation_list_whole.sort()
+    first_phase_relation_list_whole = list(k for k, _ in itertools.groupby(first_phase_relation_list_whole))
+    second_phase_relation_list_whole.sort()
+    second_phase_relation_list_whole = list(k for k, _ in itertools.groupby(second_phase_relation_list_whole))
+    third_phase_relation_list_whole.sort()
+    third_phase_relation_list_whole = list(k for k, _ in itertools.groupby(third_phase_relation_list_whole))
+
+    print((first_phase_relation_list_whole))
+    print("++++++++++++++++++++++++++++++++++++++++++++")
+    print((second_phase_relation_list_whole))
+    print("++++++++++++++++++++++++++++++++++++++++++++")
+    print((third_phase_relation_list_whole))
+
     relation_whole_list = first_phase_relation_list_whole + second_phase_relation_list_whole + third_phase_relation_list_whole
     relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
 
@@ -325,40 +395,7 @@ if __name__ == '__main__':
         seed_output_basic.write("@".join(relationElement) + "\n")
 
     for relationIndex, relationElement in enumerate(relation_whole_list):
-        seed_output_whole.write("@".join(relationElement) + "\n")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        try:
+            seed_output_whole.write("@".join(relationElement) + "\n")
+        except:
+            print(relationElement)
