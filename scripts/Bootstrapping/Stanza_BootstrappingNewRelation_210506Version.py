@@ -42,14 +42,13 @@ if __name__ == '__main__':
     REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
                     "＞", "〕", "】", "〗", "》", "〉", "\r\n"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
-    CONJUCTION_CHAR = ["的", "之", "及", "與", "等", "前"]
     NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
     NEGLECT_UPOS = ["PART", "PFA", "NUM"]
     NEGLECT_XPOS = ["SFN"]
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
     CONTINUE_WORD_UPOS = ["PROPN", "NOUN", "PART"]
     CONTINUE_WORD_XPOS = []
-    CONTINUE_SEARCHING_LIMIT = 2
+    CONTINUE_SEARCHING_LIMIT = 1
     TOLERATE_DIFFERENCE = 3
     ITERATIONS = 10
 
@@ -284,19 +283,20 @@ if __name__ == '__main__':
 
                                         # searching left
                                         for searchingIndex in range((real_predicate_index - 1), left_searching_limit, -1):
-                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]):
+                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS:
                                                 break
-                                            elif (xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
-                                                searchingIndex] in CONTINUE_WORD_UPOS):
+                                            elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                                searchingIndex] in CONTINUE_WORD_UPOS:
                                                 edges[predicate_location_in_edge] = tokens[searchingIndex] + edges[predicate_location_in_edge]
 
                                         # searching right
                                         for searchingIndex in range((real_predicate_index + 1), right_searching_limit):
-                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]):
+                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS:
                                                 break
                                             elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
                                                 searchingIndex] in CONTINUE_WORD_UPOS:
                                                 edges[predicate_location_in_edge] = edges[predicate_location_in_edge] + tokens[searchingIndex]
+
 
                                     # appending route
                                     route = path_element + "-" + resultElement[path_index + 1]
@@ -314,8 +314,7 @@ if __name__ == '__main__':
 
                             # searching left
                             for searchingIndex in range((last_token_index - 1), left_searching_limit, -1):
-                                if upos[last_token_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]) or\
-                                     (tokens[searchingIndex] in edges[predicate_location_in_edge]):
+                                if upos[last_token_index] not in NOUN_ENTITY_UPOS:
                                     break
                                 elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
                                     searchingIndex] in CONTINUE_WORD_UPOS:
@@ -323,37 +322,10 @@ if __name__ == '__main__':
 
                             # searching right
                             for searchingIndex in range((last_token_index + 1), right_searching_limit):
-                                if upos[last_token_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]) or\
-                                    (tokens[searchingIndex] in edges[predicate_location_in_edge]):
+                                if upos[last_token_index] not in NOUN_ENTITY_UPOS:
                                     break
-                                elif (xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS):
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS:
                                     edges[-1] = edges[-1] + tokens[searchingIndex]
-
-                            # clean up if including conjuction char
-                            if edges[0] not in object_dict:
-                                if edges[0][0] in CONJUCTION_CHAR:
-                                    edges[0] = edges[0][1:]
-                                if edges[0][-1] in CONJUCTION_CHAR:
-                                    edges[0] = edges[0][:-1]
-
-                            if edges[predicate_location_in_edge] not in object_dict:
-                                if edges[predicate_location_in_edge][0] in CONJUCTION_CHAR:
-                                    edges[predicate_location_in_edge] = edges[predicate_location_in_edge][1:]
-                                if edges[predicate_location_in_edge][-1] in CONJUCTION_CHAR:
-                                    edges[predicate_location_in_edge] = edges[predicate_location_in_edge][:-1]
-
-                            if edges[-1] not in object_dict:
-                                if edges[-1][0] in CONJUCTION_CHAR:
-                                    edges[-1] = edges[-1][1:]
-                                if edges[-1][-1] in CONJUCTION_CHAR:
-                                    edges[-1] = edges[-1][:-1]
-
-                            # skip if two entities are same
-                            if len(list({edges[0], edges[predicate_location_in_edge], edges[-1]})) < 3 or\
-                                edges[0] in edges[predicate_location_in_edge] or edges[predicate_location_in_edge] in edges[0] or\
-                                edges[-1] in edges[predicate_location_in_edge] or edges[predicate_location_in_edge] in edges[-1] or\
-                                edges[-1] in edges[0] or edges[0] in edges[-1]:
-                                continue
 
                             # construct basic relation form
                             basic_output_list = edges.copy()
