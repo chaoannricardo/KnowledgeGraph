@@ -40,7 +40,7 @@ if __name__ == '__main__':
         'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
     }
     REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
-                    "＞", "〕", "】", "〗", "》", "〉", "。"]
+                    "＞", "〕", "】", "〗", "》", "〉"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
     NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
     NEGLECT_UPOS = ["PART", "PFA", "NUM"]
@@ -90,23 +90,23 @@ if __name__ == '__main__':
 
     for lineIndex, line in enumerate(tqdm([line.replace("\r\n", "") for line in data_import.readlines()])):
 
-        ''' debugging code '''
-        if lineIndex == 100:
-        # if lineIndex == len([line.replace("\r\n", "") for line in data_import.readlines()]) - 1:
-            first_phase_relation_list_whole.sort()
-            first_phase_relation_list_whole = list(k for k, _ in itertools.groupby(first_phase_relation_list_whole))
-            second_phase_relation_list_whole.sort()
-            second_phase_relation_list_whole = list(k for k, _ in itertools.groupby(second_phase_relation_list_whole))
-            third_phase_relation_list_whole.sort()
-            third_phase_relation_list_whole = list(k for k, _ in itertools.groupby(third_phase_relation_list_whole))
-
-            print((first_phase_relation_list_whole))
-            print("++++++++++++++++++++++++++++++++++++++++++++")
-            print((second_phase_relation_list_whole))
-            print("++++++++++++++++++++++++++++++++++++++++++++")
-            print((third_phase_relation_list_whole))
-            break
-        ''' debigging code finished '''
+        # ''' debugging code '''
+        # if lineIndex == 100:
+        # # if lineIndex == len([line.replace("\r\n", "") for line in data_import.readlines()]) - 1:
+        #     first_phase_relation_list_whole.sort()
+        #     first_phase_relation_list_whole = list(k for k, _ in itertools.groupby(first_phase_relation_list_whole))
+        #     second_phase_relation_list_whole.sort()
+        #     second_phase_relation_list_whole = list(k for k, _ in itertools.groupby(second_phase_relation_list_whole))
+        #     third_phase_relation_list_whole.sort()
+        #     third_phase_relation_list_whole = list(k for k, _ in itertools.groupby(third_phase_relation_list_whole))
+        #
+        #     print((first_phase_relation_list_whole))
+        #     print("++++++++++++++++++++++++++++++++++++++++++++")
+        #     print((second_phase_relation_list_whole))
+        #     print("++++++++++++++++++++++++++++++++++++++++++++")
+        #     print((third_phase_relation_list_whole))
+        #     break
+        # ''' debigging code finished '''
 
         ''' Special line to eliminate years for data '''
         try:
@@ -114,20 +114,6 @@ if __name__ == '__main__':
         except IndexError:
             pass
         ''' Special line finished '''
-
-        # create graph to find shortest path
-        nodes = []
-        tokens = []
-        ids = []
-        upos = []
-        xpos = []
-        e_1_index = []
-        e_1_neglect = []
-        e_2_index = []
-        e_2_neglect = []
-        e_3_index = []
-        e_3_neglect = []
-        pos_list = []
 
         ''' Preprocessing of text line '''
         # replace special chars in line
@@ -150,170 +136,188 @@ if __name__ == '__main__':
         line = "".join(line_split)
         if line[-1] in PUNT_CHAR:
             line = line[:-1]
-
         ''' ended '''
 
-        doc = nlp(line)
-        includeObject = False
+        for sublineIndex, subline in enumerate(re.split("|".join(["。", "；"]), line)):
+            # create graph to find shortest path
+            nodes = []
+            tokens = []
+            ids = []
+            upos = []
+            xpos = []
+            e_1_index = []
+            e_1_neglect = []
+            e_2_index = []
+            e_2_neglect = []
+            e_3_index = []
+            e_3_neglect = []
+            pos_list = []
 
-        data_map = pd.DataFrame({
-            "Route": [],
-            "NameRoute": [],
-            "Edge": []
-        })
+            doc = nlp(subline)
+            includeObject = False
 
-        for sent in doc.sentences:
-            for word in sent.words:
-                # print(f"id: {word.id}", f"word: {word.text}", f"head id: {word.head}",
-                #       f"head: {sent.words[word.head - 1].text if word.head > 0 else 'root'}", f"deprel: {word.deprel}")
+            data_map = pd.DataFrame({
+                "Route": [],
+                "NameRoute": [],
+                "Edge": []
+            })
 
-                head = sent.words[word.head - 1].text if word.head > 0 else 'root'
-                nodes.append(('{0}'.format(word.id), '{0}'.format(word.head)))
-                # append to create map
-                data_map = data_map.append({"Route": str(word.id) + "-" + str(word.head),
-                                            "NameRoute": str(word.text) + "-" + str(head),
-                                            "Edge": str(word.deprel)}, ignore_index=True)
-                data_map = data_map.append({"Route": str(word.head) + "-" + str(word.id),
-                                            "NameRoute": str(head) + "-" + str(word.text),
-                                            "Edge": str(word.deprel)}, ignore_index=True)
-                # append to create token list
-                tokens.append(word.text)
-                ids.append(word.id)
-                upos.append(word.upos)
-                xpos.append(word.xpos)
+            for sent in doc.sentences:
+                for word in sent.words:
+                    # print(f"id: {word.id}", f"word: {word.text}", f"head id: {word.head}",
+                    #       f"head: {sent.words[word.head - 1].text if word.head > 0 else 'root'}", f"deprel: {word.deprel}")
 
-                # check if token list include object list word
-                if str(word.text) in object_list:
-                    includeObject = True
+                    head = sent.words[word.head - 1].text if word.head > 0 else 'root'
+                    nodes.append(('{0}'.format(word.id), '{0}'.format(word.head)))
+                    # append to create map
+                    data_map = data_map.append({"Route": str(word.id) + "-" + str(word.head),
+                                                "NameRoute": str(word.text) + "-" + str(head),
+                                                "Edge": str(word.deprel)}, ignore_index=True)
+                    data_map = data_map.append({"Route": str(word.head) + "-" + str(word.id),
+                                                "NameRoute": str(head) + "-" + str(word.text),
+                                                "Edge": str(word.deprel)}, ignore_index=True)
+                    # append to create token list
+                    tokens.append(word.text)
+                    ids.append(word.id)
+                    upos.append(word.upos)
+                    xpos.append(word.xpos)
 
-        # skip if line does not include object word
-        if not includeObject:
-            continue
+                    # check if token list include object list word
+                    if str(word.text) in object_list:
+                        includeObject = True
 
-        # get object index
-        object_index = 99999
-        for objectIndex, objectElement in enumerate(object_list):
-            if objectElement in tokens:
-                object_index = tokens.index(objectElement)
-                print(tokens[object_index])
-                break
+            # skip if line does not include object word
+            if not includeObject:
+                continue
 
-        if object_index == 99999:
-            continue
+            # get object index
+            object_index = 99999
+            for objectIndex, objectElement in enumerate(object_list):
+                if objectElement in tokens:
+                    object_index = tokens.index(objectElement)
+                    break
 
-        ''' Construct graph object for further processing '''
-        # construct graph by networkx
-        graph_test = nx.Graph(nodes)
+            if object_index == 99999:
+                continue
 
-        # construct graph with all possibilities and do bootstrapping
-        for firstIndex, firstElement in enumerate(ids):
-            for secondIndex, secondElement in enumerate(ids):
+            ''' Construct graph object for further processing '''
+            # construct graph by networkx
+            graph_test = nx.Graph(nodes)
 
-                predicate_index_list = []
-                result_list = []
+            # construct graph with all possibilities and do bootstrapping
+            for firstIndex, firstElement in enumerate(ids):
+                for secondIndex, secondElement in enumerate(ids):
 
-                if firstIndex == secondIndex or firstIndex == object_index or object_index == secondIndex or\
-                        len(str(tokens[int(firstElement) - 1])) < 2 or len(str(tokens[int(secondElement) - 1])) < 2 or\
-                        tokens[int(firstElement) - 1] in PUNT_CHAR or tokens[int(secondElement) - 1] in PUNT_CHAR or\
-                        upos[int(firstElement) - 1] in NEGLECT_UPOS or upos[int(secondElement) - 1] in NEGLECT_UPOS or\
-                        xpos[int(firstElement) - 1] in NEGLECT_XPOS or xpos[int(secondElement) - 1] in NEGLECT_XPOS:
-                    # skip if element duplicate
-                    print("hi")
-                    continue
-                else:
-                    e_1 = str(ids[object_index])
-                    print("!!!", tokens[object_index])
-                    print("@@@", tokens[int(ids[object_index]) - 1])
-                    e_1_pos = ""
-                    e_2 = str(firstElement)
-                    e_2_pos = ""
-                    e_3 = str(secondElement)
-                    e_3_pos = ""
+                    predicate_index_list = []
+                    result_list = []
 
-                    for constuctionIndexA, graphCandidatesA in enumerate([e_2, e_3]):
-                        for constuctionIndexB, graphCandidatesB in enumerate([e_2, e_3]):
-                            # skip if candidates are same
-                            if graphCandidatesA == graphCandidatesB or \
-                                    e_1 == graphCandidatesA or e_1 == graphCandidatesB:
-                                continue
+                    if firstIndex == secondIndex or firstIndex == object_index or object_index == secondIndex or \
+                            len(str(tokens[int(firstElement) - 1])) < 2 or len(
+                        str(tokens[int(secondElement) - 1])) < 2 or \
+                            tokens[int(firstElement) - 1] in PUNT_CHAR or tokens[int(secondElement) - 1] in PUNT_CHAR or \
+                            upos[int(firstElement) - 1] in NEGLECT_UPOS or upos[
+                        int(secondElement) - 1] in NEGLECT_UPOS or \
+                            xpos[int(firstElement) - 1] in NEGLECT_XPOS or xpos[int(secondElement) - 1] in NEGLECT_XPOS:
+                        # skip if element duplicate
+                        continue
+                    else:
+                        ''' debugging code '''
+                        # print("!!!", tokens[object_index])
+                        # print("@@@", tokens[int(ids[object_index]) - 1])
+                        ''' ended '''
 
-                            shortest_path_list = nx.shortest_path(graph_test, source=e_1,
-                                                                  target=graphCandidatesA) + nx.shortest_path(
-                                graph_test,
-                                source=graphCandidatesA, target=graphCandidatesB)[1:]
-                            predicate_index_list.append(
-                                len(nx.shortest_path(graph_test, source=e_1, target=graphCandidatesA)) - 1)
-                            result_list.append(shortest_path_list)
+                        e_1 = str(ids[object_index])
+                        e_1_pos = ""
+                        e_2 = str(firstElement)
+                        e_2_pos = ""
+                        e_3 = str(secondElement)
+                        e_3_pos = ""
 
-                            try:
-                                pass
-                            except (nx.exception.NetworkXNoPath, nx.exception.NodeNotFound):
-                                pass
+                        for constuctionIndexA, graphCandidatesA in enumerate([e_2, e_3]):
+                            for constuctionIndexB, graphCandidatesB in enumerate([e_2, e_3]):
+                                # skip if candidates are same
+                                if graphCandidatesA == graphCandidatesB or \
+                                        e_1 == graphCandidatesA or e_1 == graphCandidatesB:
+                                    continue
 
-                    # construct output result
-                    for resultIndex, resultElement in enumerate(result_list):
-                        edges = [tokens[int(resultElement[0]) - 1]]
-                        print("@@@", tokens[int(resultElement[0]) - 1])
-                        for path_index, path_element in enumerate(resultElement):
-                            if path_index + 1 == len(resultElement):
-                                continue
-                            else:
-                                if path_index == predicate_index_list[resultIndex]:
-                                    edges.append(tokens[int(path_element) - 1])
-                                route = path_element + "-" + resultElement[path_index + 1]
-                                try:
-                                    edges.append(data_map[data_map["Route"] == route]["Edge"].iloc[0])
-                                except IndexError:
-                                    pass
+                                shortest_path_list = nx.shortest_path(graph_test, source=e_1,
+                                                                      target=graphCandidatesA) + nx.shortest_path(
+                                    graph_test,
+                                    source=graphCandidatesA, target=graphCandidatesB)[1:]
+                                predicate_index_list.append(
+                                    len(nx.shortest_path(graph_test, source=e_1, target=graphCandidatesA)) - 1)
+                                result_list.append(shortest_path_list)
 
-                        edges.append(tokens[int(resultElement[-1]) - 1])
+                        # construct output result
+                        for resultIndex, resultElement in enumerate(result_list):
+                            edges = [tokens[int(resultElement[0]) - 1]]
 
-                        basic_output_list = edges.copy()
-                        basic_output_list_no_trigger = edges.copy()
-                        basic_output_list[0] = "Entity"
-                        basic_output_list[-1] = "Entity"
-                        basic_output_list_no_trigger[0] = "Entity"
-                        basic_output_list_no_trigger[-1] = "Entity"
-                        basic_output_list_no_trigger[predicate_index_list[resultIndex] + 1] = "Predicate"
+                            ''' debugging code '''
+                            # print("@@@", tokens[int(resultElement[0]) - 1])
+                            ''' ended '''
 
-                        # print(edges)
-                        # print(basic_output_list)
-
-                        ''' First Phase - all but entities are same '''
-                        if basic_output_list in seed_relation_list:
-                            first_phase_relation_list.append(basic_output_list)
-                            first_phase_relation_list_whole.append(edges)
-
-                        predicate_index = (predicate_index_list[resultIndex] + 1)
-
-                        for seedIndex, seedRelation in enumerate(seed_relation_list):
-                            if len(seedRelation) == len(basic_output_list):
-                                is_predicate_same = False
-                                difference = 0
-                                for testingIndex, testingElement in enumerate(basic_output_list):
-                                    if testingIndex == 0 or testingIndex == (len(basic_output_list) - 1):
-                                        continue
-                                    else:
-                                        if testingElement == seedRelation[testingIndex]:
-                                            if testingIndex == predicate_index:
-                                                is_predicate_same = True
-                                        else:
-                                            difference += 1
-
-                                ''' Second Phase - one of dependencies is different '''
-                                ''' Third Phase - trigger word is different '''
-                                if difference <= TOLERATE_DIFFERENCE and is_predicate_same:
-                                    second_phase_relation_list.append(basic_output_list)
-                                    second_phase_relation_list_whole.append(edges)
-                                elif difference <= TOLERATE_DIFFERENCE and is_predicate_same is not True:
-                                    third_phase_relation_list.append(basic_output_list)
-                                    third_phase_relation_list_whole.append(edges)
+                            for path_index, path_element in enumerate(resultElement):
+                                if path_index + 1 == len(resultElement):
+                                    continue
                                 else:
-                                    # print(difference, is_predicate_same)
-                                    pass
-                        # print(len(third_phase_relation_list))
-                        # print(len(third_phase_relation_list_whole))
+                                    if path_index == predicate_index_list[resultIndex]:
+                                        edges.append(tokens[int(path_element) - 1])
+                                    route = path_element + "-" + resultElement[path_index + 1]
+                                    try:
+                                        edges.append(data_map[data_map["Route"] == route]["Edge"].iloc[0])
+                                    except IndexError:
+                                        pass
 
+                            edges.append(tokens[int(resultElement[-1]) - 1])
+
+                            basic_output_list = edges.copy()
+                            basic_output_list_no_trigger = edges.copy()
+                            basic_output_list[0] = "Entity"
+                            basic_output_list[-1] = "Entity"
+                            basic_output_list_no_trigger[0] = "Entity"
+                            basic_output_list_no_trigger[-1] = "Entity"
+                            basic_output_list_no_trigger[predicate_index_list[resultIndex] + 1] = "Predicate"
+
+                            # print(edges)
+                            # print(basic_output_list)
+
+                            ''' First Phase - all but entities are same '''
+                            if basic_output_list in seed_relation_list:
+                                first_phase_relation_list.append(basic_output_list)
+                                first_phase_relation_list_whole.append(edges)
+
+                            predicate_index = (predicate_index_list[resultIndex] + 1)
+
+                            for seedIndex, seedRelation in enumerate(seed_relation_list):
+                                if len(seedRelation) == len(basic_output_list):
+                                    is_predicate_same = False
+                                    difference = 0
+                                    for testingIndex, testingElement in enumerate(basic_output_list):
+                                        if testingIndex == 0 or testingIndex == (len(basic_output_list) - 1):
+                                            continue
+                                        else:
+                                            if testingElement == seedRelation[testingIndex]:
+                                                if testingIndex == predicate_index:
+                                                    is_predicate_same = True
+                                            else:
+                                                difference += 1
+
+                                    ''' Second Phase - one of dependencies is different '''
+                                    ''' Third Phase - trigger word is different '''
+                                    if difference <= TOLERATE_DIFFERENCE and is_predicate_same:
+                                        second_phase_relation_list.append(basic_output_list)
+                                        second_phase_relation_list_whole.append(edges)
+                                    elif difference <= TOLERATE_DIFFERENCE and is_predicate_same is not True:
+                                        third_phase_relation_list.append(basic_output_list)
+                                        third_phase_relation_list_whole.append(edges)
+
+                            ''' debugging code '''
+                            # print(len(third_phase_relation_list))
+                            # print(len(third_phase_relation_list_whole))
+                            ''' ended '''
+
+
+    ''' Enumerate relations & export '''
     relation_whole_list = first_phase_relation_list_whole + second_phase_relation_list_whole + third_phase_relation_list_whole
     relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
 
