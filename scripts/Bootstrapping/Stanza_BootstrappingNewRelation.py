@@ -51,7 +51,7 @@ if __name__ == '__main__':
     CONTINUE_WORD_XPOS = []
     CONTINUE_SEARCHING_LIMIT = 2
     TOLERATE_DIFFERENCE = 3
-    THIRD_PHASE_COUNT_THERSHOLD = 5
+    THIRD_PHASE_COUNT_THERSHOLD = 30
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -88,10 +88,13 @@ if __name__ == '__main__':
     ''' bootstrapping starts '''
     first_phase_relation_list = []
     first_phase_relation_list_whole = []
+    first_phase_relation_list_no_trigger = []
     second_phase_relation_list = []
     second_phase_relation_list_whole = []
+    second_phase_relation_list_no_trigger = []
     third_phase_relation_list = []
     third_phase_relation_list_whole = []
+    third_phase_relation_list_no_trigger = []
     output_upos_whole = []
     output_xpos_whole = []
     trigger_word_candidate = []
@@ -277,7 +280,6 @@ if __name__ == '__main__':
                             output_upos = [upos[first_token_index]]
                             output_xpos = [xpos[first_token_index]]
 
-
                             # searching left
                             for searchingIndex in range((first_token_index - 1), left_searching_limit, -1):
                                 if upos[first_token_index] not in NOUN_ENTITY_UPOS:
@@ -432,6 +434,7 @@ if __name__ == '__main__':
                             if basic_output_list in seed_relation_list:
                                 first_phase_relation_list.append(basic_output_list)
                                 first_phase_relation_list_whole.append(edges)
+                                first_phase_relation_list_no_trigger.append(basic_output_list_no_trigger)
 
                             predicate_index = (predicate_index_list[resultIndex] + 1)
 
@@ -454,9 +457,11 @@ if __name__ == '__main__':
                                     if difference <= TOLERATE_DIFFERENCE and is_predicate_same:
                                         second_phase_relation_list.append(basic_output_list)
                                         second_phase_relation_list_whole.append(edges)
+                                        second_phase_relation_list_no_trigger.append(basic_output_list_no_trigger)
                                     elif difference <= TOLERATE_DIFFERENCE and is_predicate_same is not True:
                                         third_phase_relation_list.append(basic_output_list)
                                         third_phase_relation_list_whole.append(edges)
+                                        third_phase_relation_list_no_trigger.append(basic_output_list_no_trigger)
                                         output_upos_whole.append(output_upos)
                                         output_xpos_whole.append(output_xpos)
 
@@ -499,12 +504,11 @@ if __name__ == '__main__':
     Filter: 
     * Calculate count of bootstapping method, eliminate those below thershold
     '''
-
     data_third_phase_candidate = pd.DataFrame({
-        "Candidate": ["@".join(relationElement) for relationElement in third_phase_relation_list]
+        "Candidate": ["@".join(relationElement) for relationElement in third_phase_relation_list_no_trigger]
     })
     data_third_phase_candidate_filter = data_third_phase_candidate.value_counts().reset_index()
-    print(data_third_phase_candidate_filter)
+    data_third_phase_candidate_filter.to_csv("./temp.csv")
     data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1]\
                                                                           > THIRD_PHASE_COUNT_THERSHOLD].iloc[:, 0].tolist()
     ''' Filter Ended '''
@@ -525,6 +529,7 @@ if __name__ == '__main__':
                 temp_basic_form[tempIndex] = "Predicate"
 
         # only export if it's beyond threshold
+        temp_basic_form = "@".join(temp_basic_form)
         if temp_basic_form in data_third_phase_candidate_filter:
             seed_output_whole.write("@".join(relationElement) + "\n")
 
