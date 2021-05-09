@@ -16,7 +16,6 @@ import pandas as pd
 import re
 import stanza
 
-
 if __name__ == '__main__':
     ''' Configurations '''
     BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
@@ -40,17 +39,19 @@ if __name__ == '__main__':
         'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
     }
     REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
-                    "＞", "〕", "】", "〗", "》", "〉", "\r\n"]
+                    "＞", "〕", "】", "〗", "》", "〉", "\r\n", "ˋ"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
     CONJUCTION_CHAR = ["的", "之", "及", "與", "等", "前"]
     NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
     NEGLECT_UPOS = ["PART", "PFA", "NUM"]
     NEGLECT_XPOS = ["SFN"]
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
-    CONTINUE_WORD_UPOS = ["PROPN", "NOUN", "PART"]
+    CONTINUE_WORD_UPOS_FIRST = ["PROPN"]  # "NOUN"
+    CONTINUE_WORD_UPOS_LAST = ["PART"]
     CONTINUE_WORD_XPOS = []
     CONTINUE_SEARCHING_LIMIT = 2
     TOLERATE_DIFFERENCE = 3
+    THIRD_PHASE_COUNT_THERSHOLD = 5
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -65,7 +66,6 @@ if __name__ == '__main__':
     seed_output_whole = codecs.open(NEW_WHOLE_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     trigger_word_output = codecs.open(NEW_TRIGGER_WORD_OUTPUT_PATH, mode="w", encoding="utf8")
 
-    # process formally starts
     ''' Construct variables for bootstrapping '''
     seed_relation_list = []
     relation_location_index = []
@@ -92,6 +92,10 @@ if __name__ == '__main__':
     second_phase_relation_list_whole = []
     third_phase_relation_list = []
     third_phase_relation_list_whole = []
+    output_upos_whole = []
+    output_xpos_whole = []
+    trigger_word_candidate = []
+    trigger_word_output = []
 
     ''' Enumerate over file lines '''
     for lineIndex, line in enumerate(tqdm(data_import.readlines())):
@@ -226,6 +230,24 @@ if __name__ == '__main__':
                         e_3 = str(secondElement)
                         e_3_pos = ""
 
+                        ''' 
+                        Filter:
+                        * check if all entity are inside dictionary, if yes, eliminated
+                        * eliminate if conclude more than one verb
+                        '''
+                        temp_token_count = 0
+                        temp_upos_count = 0
+                        for temp_index in [(int(e_1) - 1), (int(e_2) - 1), (int(e_3) - 1)]:
+                            # entity in object list check
+                            if tokens[temp_index] in object_list:
+                                temp_token_count += 1
+                            # upos contain verb check
+                            if upos[temp_index] == "VERB":
+                                temp_upos_count += 1
+                        if temp_token_count == 3 or temp_upos_count >= 2:
+                            continue
+                        ''' Filter Ended '''
+
                         for constuctionIndexA, graphCandidatesA in enumerate([e_2, e_3]):
                             for constuctionIndexB, graphCandidatesB in enumerate([e_2, e_3]):
                                 # skip if candidates are same
@@ -246,23 +268,30 @@ if __name__ == '__main__':
 
                             # append first token: check if entity is continued by nouns, if so, concat together
                             first_token_index = int(resultElement[0]) - 1
-                            left_searching_limit = (first_token_index - CONTINUE_SEARCHING_LIMIT) if (first_token_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
-                            right_searching_limit = (first_token_index + CONTINUE_SEARCHING_LIMIT) if (first_token_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
+                            left_searching_limit = (first_token_index - CONTINUE_SEARCHING_LIMIT) if \
+                                (first_token_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
+                            right_searching_limit = (first_token_index + CONTINUE_SEARCHING_LIMIT) if \
+                                (first_token_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
 
                             edges = [tokens[first_token_index]]
+                            output_upos = [upos[first_token_index]]
+                            output_xpos = [xpos[first_token_index]]
+
 
                             # searching left
                             for searchingIndex in range((first_token_index - 1), left_searching_limit, -1):
                                 if upos[first_token_index] not in NOUN_ENTITY_UPOS:
                                     break
-                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS:
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                    searchingIndex] in CONTINUE_WORD_UPOS_FIRST:
                                     edges[0] = tokens[searchingIndex] + edges[0]
 
                             # searching right
-                            for searchingIndex in range((first_token_index + 1),  right_searching_limit):
+                            for searchingIndex in range((first_token_index + 1), right_searching_limit):
                                 if upos[first_token_index] not in NOUN_ENTITY_UPOS:
                                     break
-                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS:
+                                elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                    searchingIndex] in CONTINUE_WORD_UPOS_LAST:
                                     edges[0] = edges[0] + tokens[searchingIndex]
 
                             ''' debugging code '''
@@ -277,26 +306,36 @@ if __name__ == '__main__':
                                     if path_index == predicate_index_list[resultIndex]:
                                         predicate_location_in_edge = len(edges)
                                         real_predicate_index = int(path_element) - 1
-                                        left_searching_limit = (real_predicate_index - CONTINUE_SEARCHING_LIMIT) if (real_predicate_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
-                                        right_searching_limit = (real_predicate_index + CONTINUE_SEARCHING_LIMIT) if (real_predicate_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
+                                        left_searching_limit = (real_predicate_index - CONTINUE_SEARCHING_LIMIT) if \
+                                            (real_predicate_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
+                                        right_searching_limit = (real_predicate_index + CONTINUE_SEARCHING_LIMIT) if \
+                                            (real_predicate_index + CONTINUE_SEARCHING_LIMIT) < \
+                                            len(tokens) else len(tokens)
 
                                         edges.append(tokens[real_predicate_index])
+                                        output_upos.append(upos[real_predicate_index])
+                                        output_xpos.append(xpos[real_predicate_index])
 
                                         # searching left
-                                        for searchingIndex in range((real_predicate_index - 1), left_searching_limit, -1):
-                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]):
+                                        for searchingIndex in range((real_predicate_index - 1), left_searching_limit,
+                                                                    -1):
+                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS or (
+                                                    tokens[searchingIndex] in edges[0]):
                                                 break
                                             elif (xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
-                                                searchingIndex] in CONTINUE_WORD_UPOS):
-                                                edges[predicate_location_in_edge] = tokens[searchingIndex] + edges[predicate_location_in_edge]
+                                                searchingIndex] in CONTINUE_WORD_UPOS_FIRST):
+                                                edges[predicate_location_in_edge] = tokens[searchingIndex] + edges[
+                                                    predicate_location_in_edge]
 
                                         # searching right
                                         for searchingIndex in range((real_predicate_index + 1), right_searching_limit):
-                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]):
+                                            if upos[real_predicate_index] not in NOUN_ENTITY_UPOS or (
+                                                    tokens[searchingIndex] in edges[0]):
                                                 break
                                             elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
-                                                searchingIndex] in CONTINUE_WORD_UPOS:
-                                                edges[predicate_location_in_edge] = edges[predicate_location_in_edge] + tokens[searchingIndex]
+                                                searchingIndex] in CONTINUE_WORD_UPOS_LAST:
+                                                edges[predicate_location_in_edge] = edges[predicate_location_in_edge] + \
+                                                                                    tokens[searchingIndex]
 
                                     # appending route
                                     route = path_element + "-" + resultElement[path_index + 1]
@@ -307,53 +346,75 @@ if __name__ == '__main__':
 
                             # appending last entity
                             last_token_index = int(resultElement[-1]) - 1
-                            left_searching_limit = (last_token_index - CONTINUE_SEARCHING_LIMIT) if (last_token_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
-                            right_searching_limit = (last_token_index + CONTINUE_SEARCHING_LIMIT) if (last_token_index + CONTINUE_SEARCHING_LIMIT) < len(tokens) else len(tokens)
+                            left_searching_limit = (last_token_index - CONTINUE_SEARCHING_LIMIT) if \
+                                (last_token_index - CONTINUE_SEARCHING_LIMIT) >= 0 else 0
+                            right_searching_limit = (last_token_index + CONTINUE_SEARCHING_LIMIT) if \
+                                (last_token_index + CONTINUE_SEARCHING_LIMIT) < len(
+                                tokens) else len(tokens)
 
                             edges.append(tokens[last_token_index])
+                            output_upos.append(upos[last_token_index])
+                            output_xpos.append(xpos[last_token_index])
 
                             # searching left
                             for searchingIndex in range((last_token_index - 1), left_searching_limit, -1):
-                                if upos[last_token_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]) or\
-                                     (tokens[searchingIndex] in edges[predicate_location_in_edge]):
+                                if upos[last_token_index] not in NOUN_ENTITY_UPOS or (
+                                        tokens[searchingIndex] in edges[0]) or \
+                                        (tokens[searchingIndex] in edges[predicate_location_in_edge]):
                                     break
                                 elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
-                                    searchingIndex] in CONTINUE_WORD_UPOS:
+                                    searchingIndex] in CONTINUE_WORD_UPOS_FIRST:
                                     edges[-1] = tokens[searchingIndex] + edges[-1]
 
                             # searching right
                             for searchingIndex in range((last_token_index + 1), right_searching_limit):
-                                if upos[last_token_index] not in NOUN_ENTITY_UPOS or (tokens[searchingIndex] in edges[0]) or\
-                                    (tokens[searchingIndex] in edges[predicate_location_in_edge]):
+                                if upos[last_token_index] not in NOUN_ENTITY_UPOS or (
+                                        tokens[searchingIndex] in edges[0]) or \
+                                        (tokens[searchingIndex] in edges[predicate_location_in_edge]):
                                     break
-                                elif (xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[searchingIndex] in CONTINUE_WORD_UPOS):
+                                elif (xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
+                                    searchingIndex] in CONTINUE_WORD_UPOS_FIRST):
                                     edges[-1] = edges[-1] + tokens[searchingIndex]
 
                             # clean up if including conjuction char
-                            if edges[0] not in object_dict:
+                            if edges[0] not in object_list:
                                 if edges[0][0] in CONJUCTION_CHAR:
                                     edges[0] = edges[0][1:]
                                 if edges[0][-1] in CONJUCTION_CHAR:
                                     edges[0] = edges[0][:-1]
 
-                            if edges[predicate_location_in_edge] not in object_dict:
+                            if edges[predicate_location_in_edge] not in object_list:
                                 if edges[predicate_location_in_edge][0] in CONJUCTION_CHAR:
                                     edges[predicate_location_in_edge] = edges[predicate_location_in_edge][1:]
                                 if edges[predicate_location_in_edge][-1] in CONJUCTION_CHAR:
                                     edges[predicate_location_in_edge] = edges[predicate_location_in_edge][:-1]
 
-                            if edges[-1] not in object_dict:
+                            if edges[-1] not in object_list:
                                 if edges[-1][0] in CONJUCTION_CHAR:
                                     edges[-1] = edges[-1][1:]
                                 if edges[-1][-1] in CONJUCTION_CHAR:
                                     edges[-1] = edges[-1][:-1]
 
-                            # skip if two entities are same
-                            if len(list({edges[0], edges[predicate_location_in_edge], edges[-1]})) < 3 or\
-                                edges[0] in edges[predicate_location_in_edge] or edges[predicate_location_in_edge] in edges[0] or\
-                                edges[-1] in edges[predicate_location_in_edge] or edges[predicate_location_in_edge] in edges[-1] or\
-                                edges[-1] in edges[0] or edges[0] in edges[-1]:
+                            '''
+                            Filter:
+                            * skip if two entities are same
+                            * if dependencies only conclude conj
+                            '''
+                            dependency_list = edges[1:-1].copy()
+                            dependency_list[predicate_location_in_edge - 1] = "conj"
+
+                            # if edges[0] == "奧地利":
+                            #     print(dependency_list)
+
+                            if len(list({edges[0], edges[predicate_location_in_edge], edges[-1]})) < 3 or \
+                                    edges[0] in edges[predicate_location_in_edge] or edges[
+                                predicate_location_in_edge] in edges[0] or \
+                                    edges[-1] in edges[predicate_location_in_edge] or edges[
+                                predicate_location_in_edge] in edges[-1] or \
+                                    edges[-1] in edges[0] or edges[0] in edges[-1] or (
+                                    len(list(set(dependency_list))) == 1 and "conj" in dependency_list):
                                 continue
+                            ''' Filter Ended '''
 
                             # construct basic relation form
                             basic_output_list = edges.copy()
@@ -396,6 +457,11 @@ if __name__ == '__main__':
                                     elif difference <= TOLERATE_DIFFERENCE and is_predicate_same is not True:
                                         third_phase_relation_list.append(basic_output_list)
                                         third_phase_relation_list_whole.append(edges)
+                                        output_upos_whole.append(output_upos)
+                                        output_xpos_whole.append(output_xpos)
+
+                                        # append trigger word candidate
+                                        trigger_word_candidate.append(edges[predicate_location_in_edge])
 
                             ''' debugging code '''
                             # print(len(third_phase_relation_list))
@@ -403,6 +469,7 @@ if __name__ == '__main__':
                             ''' ended '''
 
     ''' Enumerate relations & export '''
+    # remove duplicates
     first_phase_relation_list_whole.sort()
     first_phase_relation_list_whole = list(k for k, _ in itertools.groupby(first_phase_relation_list_whole))
     second_phase_relation_list_whole.sort()
@@ -410,20 +477,56 @@ if __name__ == '__main__':
     third_phase_relation_list_whole.sort()
     third_phase_relation_list_whole = list(k for k, _ in itertools.groupby(third_phase_relation_list_whole))
 
-    print((first_phase_relation_list_whole))
-    print("++++++++++++++++++++++++++++++++++++++++++++")
-    print((second_phase_relation_list_whole))
-    print("++++++++++++++++++++++++++++++++++++++++++++")
-    print((third_phase_relation_list_whole))
+    first_phase_relation_list.sort()
+    first_phase_relation_list = list(k for k, _ in itertools.groupby(first_phase_relation_list))
+    second_phase_relation_list.sort()
+    second_phase_relation_list = list(k for k, _ in itertools.groupby(second_phase_relation_list))
+    third_phase_relation_list.sort()
+    third_phase_relation_list = list(k for k, _ in itertools.groupby(third_phase_relation_list))
+
+    trigger_word_candidate = list(set(trigger_word_candidate))
+
+    # print((first_phase_relation_list_whole))
+    # print("++++++++++++++++++++++++++++++++++++++++++++")
+    # print((second_phase_relation_list_whole))
+    # print("++++++++++++++++++++++++++++++++++++++++++++")
+    # print((third_phase_relation_list_whole))
 
     relation_whole_list = first_phase_relation_list_whole + second_phase_relation_list_whole + third_phase_relation_list_whole
     relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
 
+    '''
+    Filter: 
+    * Calculate count of bootstapping method, eliminate those below thershold
+    '''
+
+    data_third_phase_candidate = pd.DataFrame({
+        "Candidate": ["@".join(relationElement) for relationElement in third_phase_relation_list]
+    })
+    data_third_phase_candidate_filter = data_third_phase_candidate.value_counts().reset_index()
+    print(data_third_phase_candidate_filter)
+    data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1]\
+                                                                          > THIRD_PHASE_COUNT_THERSHOLD].iloc[:, 0].tolist()
+    ''' Filter Ended '''
+
     for relationIndex, relationElement in enumerate(relation_list):
-        seed_output_basic.write("@".join(relationElement) + "\n")
+        if relationIndex >= len(first_phase_relation_list + second_phase_relation_list):
+            if "@".join(relationElement) in data_third_phase_candidate_filter:
+                seed_output_basic.write("@".join(relationElement) + "\n")
+        else:
+            seed_output_basic.write("@".join(relationElement) + "\n")
 
     for relationIndex, relationElement in enumerate(relation_whole_list):
-        try:
+        # create basic form
+        temp_basic_form = relationElement.copy()
+        temp_basic_form[0] = temp_basic_form[-1] = "Entity"
+        for tempIndex, tempElement in enumerate(temp_basic_form):
+            if tempElement in trigger_word_candidate:
+                temp_basic_form[tempIndex] = "Predicate"
+
+        # only export if it's beyond threshold
+        if temp_basic_form in data_third_phase_candidate_filter:
             seed_output_whole.write("@".join(relationElement) + "\n")
-        except:
-            print(relationElement)
+
+        # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
+        # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")
