@@ -1,4 +1,11 @@
 # -*- coding: utf8 -*-
+"""
+
+Reference:
+* https://stackoverflow.com/questions/52455774/googletrans-stopped-working-with-error-nonetype-object-has-no-attribute-group
+* https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages
+
+"""
 from google_trans_new import google_translator
 from tqdm import tqdm
 import codecs
@@ -56,7 +63,7 @@ if __name__ == '__main__':
                 file_export_mandarin.write(translation + "\n")
                 break
             except google_trans_new.google_trans_new.google_new_transError:
-                time.sleep(60)
+                time.sleep(10)
                 pass
 
 

@@ -4,10 +4,11 @@ import pandas as pd
 
 
 if __name__ == '__main__':
+    ''' Configurations '''
     SEED_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"
     FILTER_SEED_EXPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"
-
-    # process start
+    FILTER_COUNT_CRITEREA = 6
+    ''' Process Starts '''
     seed_pattern_list = []
 
     seed_basic = codecs.open(SEED_IMPORT_PATH, mode="r", encoding="utf8", errors="ignore")
@@ -25,7 +26,7 @@ if __name__ == '__main__':
     })
 
     data_filter = data_calculate["SeedType"].value_counts().reset_index()
-    data_filter = data_filter[data_filter["SeedType"] >= 5].iloc[:, 0].tolist()
+    data_filter = data_filter[data_filter["SeedType"] >= FILTER_COUNT_CRITEREA].iloc[:, 0].tolist()
 
     for lineIndex, lineElement in enumerate(data_filter):
         seed_filter_export.write(lineElement + "\n")

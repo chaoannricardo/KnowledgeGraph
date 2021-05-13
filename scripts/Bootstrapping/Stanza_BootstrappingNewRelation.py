@@ -236,7 +236,7 @@ if __name__ == '__main__':
                         ''' 
                         Filter:
                         * check if all entity are inside dictionary, if yes, eliminated
-                        * eliminate if conclude more than one verb
+                        * eliminate if conclude more than one verb, or only one noun
                         '''
                         temp_token_count = 0
                         temp_upos_count = 0
@@ -245,10 +245,14 @@ if __name__ == '__main__':
                             if tokens[temp_index] in object_list:
                                 temp_token_count += 1
                             # upos contain verb check
-                            if upos[temp_index] == "VERB":
+                            if upos[temp_index] in ["NOUN", "PROPN"]:
                                 temp_upos_count += 1
-                        if temp_token_count == 3 or temp_upos_count >= 2:
+                        if temp_token_count == 3 or temp_upos_count < 2:
                             continue
+                        if "CCONJ" in upos and upos.count("CCONJ") == 1:
+                            if str(firstElement) != str(upos.index("CCONJ")) and str(secondElement) != str(upos.index("CCONJ")):
+                                # print(str(upos.index("CCONJ")))
+                                continue
                         ''' Filter Ended '''
 
                         for constuctionIndexA, graphCandidatesA in enumerate([e_2, e_3]):
