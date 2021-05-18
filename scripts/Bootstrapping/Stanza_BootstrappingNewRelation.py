@@ -283,8 +283,8 @@ if __name__ == '__main__':
                             elif "CCONJ" in upos and upos.count("CCONJ") == 1:
                                 # if str(firstElement) != str(upos.index("CCONJ")) and str(secondElement) != str(
                                 #         upos.index("CCONJ")):
-                                    # print(str(upos.index("CCONJ")))
-                                    continue
+                                # print(str(upos.index("CCONJ")))
+                                continue
                             ''' Filter Ended '''
 
                             for constuctionIndexA, graphCandidatesA in enumerate([e_2, e_3]):
@@ -453,9 +453,9 @@ if __name__ == '__main__':
                                     predicate_location_in_edge] in edges[0] or \
                                         edges[-1] in edges[predicate_location_in_edge] or edges[
                                     predicate_location_in_edge] in edges[-1] or \
-                                        edges[-1] in edges[0] or edges[0] in edges[-1] or\
-                                        (len(list(set(dependency_list))) == 1 and "conj" in dependency_list) or\
-                                        len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or\
+                                        edges[-1] in edges[0] or edges[0] in edges[-1] or \
+                                        (len(list(set(dependency_list))) == 1 and "conj" in dependency_list) or \
+                                        len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or \
                                         len(str(edges[predicate_location_in_edge])) < 2:
                                     continue
                                 ''' Filter Ended '''
@@ -551,8 +551,9 @@ if __name__ == '__main__':
     })
     data_third_phase_candidate_filter = data_third_phase_candidate.value_counts().reset_index()
     data_third_phase_candidate_filter.to_csv("./temp.csv")
-    data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1]\
-                                                                          > THIRD_PHASE_COUNT_THERSHOLD].iloc[:, 0].tolist()
+    data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1] \
+                                                                          > THIRD_PHASE_COUNT_THERSHOLD].iloc[:,
+                                        0].tolist()
     ''' Filter Ended '''
 
     for relationIndex, relationElement in enumerate(relation_list):
@@ -581,8 +582,9 @@ if __name__ == '__main__':
         temp_basic_form = "@".join(temp_basic_form)
         if temp_basic_form in data_third_phase_candidate_filter:
             seed_output_whole.write("@".join(relationElement) + "\n")
-            seed_output_only_relation.write("@".join(simple_relation_format) + "\n")
-
+            seed_output_only_relation.write("@".join(simple_relation_format) +
+                                            "|" + "@".join(output_upos_whole[relationIndex]) +
+                                            "|" + "@".join(output_xpos_whole[relationIndex]) + "\n")
 
         # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
         # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")
