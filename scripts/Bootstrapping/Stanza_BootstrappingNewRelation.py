@@ -29,6 +29,7 @@ if __name__ == '__main__':
     NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_BASIC.csv"
     NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_WHOLE.csv"
     NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
+    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
 
     # semiconductor config
     # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
@@ -40,6 +41,7 @@ if __name__ == '__main__':
     # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_BASIC.csv"
     # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_WHOLE.csv"
     # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_TRIGGER_WORD.csv"
+    # NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_ONLY_RELATION.csv"
 
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
@@ -77,6 +79,7 @@ if __name__ == '__main__':
     seed_output = codecs.open(NEW_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     seed_output_basic = codecs.open(NEW_BASIC_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     seed_output_whole = codecs.open(NEW_WHOLE_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
+    seed_output_only_relation = codecs.open(NEW_SEED_ONLY_RELATION, mode="w", encoding="utf8")
     trigger_word_output = codecs.open(NEW_TRIGGER_WORD_OUTPUT_PATH, mode="w", encoding="utf8")
 
     ''' Construct variables for bootstrapping '''
@@ -95,7 +98,7 @@ if __name__ == '__main__':
     trigger_word_list = trigger_word_dict.readline().split(",")
     object_list = [line.replace("\r\n", "").split(",")[0] for line in object_dict.readlines()]
 
-    print(object_list)
+    print("字典含有詞目：", object_list)
 
     # load spaCy engines
     nlp = stanza.Pipeline(**config)
@@ -128,10 +131,10 @@ if __name__ == '__main__':
             ''' ended '''
 
             ''' Special line to eliminate years for data '''
-            # try:
-            #     line = line.split("：")[1]
-            # except IndexError:
-            #     pass
+            try:
+                line = line.split("：")[1]
+            except IndexError:
+                pass
             ''' Special line finished '''
 
             ''' Preprocessing of text line '''
@@ -264,16 +267,20 @@ if __name__ == '__main__':
                             '''
                             temp_token_count = 0
                             temp_upos_count = 0
+                            temp_verb_count = 0
+
                             for temp_index in [(int(e_1) - 1), (int(e_2) - 1), (int(e_3) - 1)]:
                                 # entity in object list check
                                 if tokens[temp_index] in object_list:
                                     temp_token_count += 1
                                 # upos contain verb check
-                                if upos[temp_index] in ["NOUN", "PROPN"]:
+                                if upos[temp_index] in NOUN_ENTITY_UPOS:
                                     temp_upos_count += 1
-                            if temp_token_count == 3 or temp_upos_count < 2:
+                                elif upos[temp_index] in ["VERB"]:
+                                    temp_verb_count += 1
+                            if temp_token_count == 3 or temp_upos_count < 2 or temp_verb_count > 1:
                                 continue
-                            if "CCONJ" in upos and upos.count("CCONJ") == 1:
+                            elif "CCONJ" in upos and upos.count("CCONJ") == 1:
                                 # if str(firstElement) != str(upos.index("CCONJ")) and str(secondElement) != str(
                                 #         upos.index("CCONJ")):
                                     # print(str(upos.index("CCONJ")))
@@ -433,6 +440,7 @@ if __name__ == '__main__':
                                 Filter:
                                 * skip if two entities are same
                                 * if dependencies only conclude conj
+                                * again eliminate relation triple that is too short
                                 '''
                                 dependency_list = edges[1:-1].copy()
                                 dependency_list[predicate_location_in_edge - 1] = "conj"
@@ -445,8 +453,10 @@ if __name__ == '__main__':
                                     predicate_location_in_edge] in edges[0] or \
                                         edges[-1] in edges[predicate_location_in_edge] or edges[
                                     predicate_location_in_edge] in edges[-1] or \
-                                        edges[-1] in edges[0] or edges[0] in edges[-1] or (
-                                        len(list(set(dependency_list))) == 1 and "conj" in dependency_list):
+                                        edges[-1] in edges[0] or edges[0] in edges[-1] or\
+                                        (len(list(set(dependency_list))) == 1 and "conj" in dependency_list) or\
+                                        len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or\
+                                        len(str(edges[predicate_location_in_edge])) < 2:
                                     continue
                                 ''' Filter Ended '''
 
@@ -556,14 +566,23 @@ if __name__ == '__main__':
         # create basic form
         temp_basic_form = relationElement.copy()
         temp_basic_form[0] = temp_basic_form[-1] = "Entity"
+
+        # simple relation constructing
+        simple_relation_format = [relationElement[0]]
+
         for tempIndex, tempElement in enumerate(temp_basic_form):
             if tempElement in trigger_word_candidate:
                 temp_basic_form[tempIndex] = "Predicate"
+                simple_relation_format.append(relationElement[tempIndex])
+
+        simple_relation_format.append(relationElement[-1])
 
         # only export if it's beyond threshold
         temp_basic_form = "@".join(temp_basic_form)
         if temp_basic_form in data_third_phase_candidate_filter:
             seed_output_whole.write("@".join(relationElement) + "\n")
+            seed_output_only_relation.write("@".join(simple_relation_format) + "\n")
+
 
         # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
         # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")
