@@ -1,0 +1,216 @@
+Å
+Angstrom
+Active component
+Alloy
+Ambient
+Ambient Temperature
+Analog circuits
+Batch Manufacturing
+Batch Processing
+BGA
+ball grid array
+Burn in
+C4
+controlled collapse chip connection
+Capacitance
+Ceramic substrates
+CSP
+chip scale package or chip size package
+Circuit
+Clean room
+CMOS
+complementary metal oxide semiconductor
+COB
+chip-on-board
+Coplanarity
+CTE
+coefficient of thermal expansion
+Daughter card
+DCA
+direct chip attach
+Die
+Dielectric
+DIPs
+dual inline package
+Distributed processing
+DNP
+distance to neutral point
+Doping
+DRAM
+dynamic random access memory
+DSP
+digital signal processors
+Etching
+Eutectic
+Expansion board
+Fabless
+Fabrication Less
+Fault tolerance
+FC
+flip chip
+Flexible printed circuit
+Flexible substrate
+Flip-Chip-On-Flex
+Flux
+Footprint
+Foundry
+GaAs
+Gallium Arsenide
+Gigabyte
+Hard disk drive
+HDD
+Integrated circuit
+Interconnect
+In-line automation
+Interposer
+KGD
+KGW
+known good die
+Laminate
+Lead Frame
+Lithography
+Mask
+MCM
+MES
+manufacturing execution systems
+Metallization
+Micron or micrometer
+mil
+MIS
+management information system
+Motherboard
+nanometer
+nm
+NIC
+network interface card
+Open systems
+Oxidation
+Pad
+Passivation
+PGA
+Pin Grid Array; Pad Gird Array
+Photoresist
+Pitch
+Plasma
+Printed circuit board
+PCB
+Printed Wiring Board
+PWB
+Reflow process
+Reticle
+Rework
+Semiconductor
+SiP
+system-in-package
+SiPs
+single in-line packages
+SIMMs
+single in-line memory modules
+Solder
+Solder mask
+Solid state
+Sputter
+Stepper
+Substrate
+Surface mount technology
+SMT
+Systems integration
+Tape automated bonding
+TAB
+Tape and reel
+Turnkey
+Underfill
+Yield
+埃
+主動元件
+合金
+周圍環境
+環繞溫度
+類比電路
+批量製造
+整批處理
+球柵式陣列構裝
+預燒
+控制塌陷高度晶片連接
+電容
+陶瓷基板
+晶片尺寸構裝
+電路
+無塵室
+型金氧半導體
+晶片直接構裝
+共平面性
+熱膨脹係數
+子板
+直接晶片接合
+晶片
+介電層
+雙排直立構裝
+分佈程序
+中心距離
+摻雜
+動態隨機存取記憶體
+數位訊號處理器
+蝕刻
+共熔合金
+擴充板
+無製造設備之半導體供應商
+容錯
+覆晶
+可撓式電路板
+可撓式基板
+於可撓性基板上的覆晶構裝
+助焊劑
+覆蓋區
+代工廠
+砷化鉀
+十億位組
+硬碟
+積體電路
+內連接
+線上自動化
+互連體
+wafer
+壓層板
+導線架
+顯影
+光罩
+多晶片模組
+製造執行系統
+金屬化
+微米
+密爾
+管理資訊系統
+母機板
+奈米
+網路介面卡
+開放式系統
+氧化法
+墊片
+鈍化層
+針柵面積陣列
+光阻
+接點間距
+電漿，等離子體
+印刷電路板
+印刷電路板
+迴焊製程
+光罩
+重工
+半導體
+系統級構裝
+單一邊線構裝
+單排內嵌式記憶體模組
+焊料
+防焊罩
+固態
+濺鍍機
+步進機
+基板
+表面黏著技術
+系統整合
+捲帶晶粒自動接合技術
+捲帶和輪捲
+一元化服務
+底膠
+良率

@@ -5,8 +5,10 @@ import codecs
 import os
 
 if __name__ == '__main__':
-    DATA_IMPORT_DIR = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetSimplified/SentenceIncident/"
-    DATA_EXPORT_DIR = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTraditional/SentenceIncident/"
+    # DATA_IMPORT_DIR = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetSimplified/SentenceIncident/"
+    # DATA_EXPORT_DIR = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTraditional/SentenceIncident/"
+    DATA_IMPORT_DIR = "C:/Users/User/Desktop/tempImport/"
+    DATA_EXPORT_DIR = "C:/Users/User/Desktop/tempExport/"
 
     ''' process starts '''
     for fileIndex, fileElement in enumerate(tqdm(os.listdir(DATA_IMPORT_DIR))):
