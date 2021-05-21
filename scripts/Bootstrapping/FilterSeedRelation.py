@@ -8,7 +8,7 @@ if __name__ == '__main__':
     ''' Configurations '''
     SEED_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"
     FILTER_SEED_EXPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"
-    FILTER_COUNT_CRITEREA = 20
+    FILTER_COUNT_CRITEREA = 14
     IF_SHOW_ESTIMATE_CURVE = True
     STARTING_FILTER = 5
     ''' Process Starts '''
