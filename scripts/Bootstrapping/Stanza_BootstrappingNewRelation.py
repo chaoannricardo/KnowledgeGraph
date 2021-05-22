@@ -20,28 +20,28 @@ import stanza
 if __name__ == '__main__':
     ''' Configurations '''
     # World Chronology Mandarin config
-    # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    # OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
-    # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-    # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
-    # NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
-
-    # semiconductor config
     BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     SUBJECT_DICT_PATH = ""  # not using subject dict path for now
     TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION.csv"
-    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_BASIC.csv"
-    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_WHOLE.csv"
-    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_TRIGGER_WORD.csv"
-    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_ONLY_RELATION.csv"
+    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
+    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION.csv"
+    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_BASIC.csv"
+    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_WHOLE.csv"
+    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
+    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
+
+    # semiconductor config
+    # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
+    # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
+    # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
+    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
+    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION.csv"
+    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_BASIC.csv"
+    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_WHOLE.csv"
+    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_TRIGGER_WORD.csv"
+    # NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_ONLY_RELATION.csv"
 
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
@@ -117,8 +117,8 @@ if __name__ == '__main__':
     third_phase_relation_list = []
     third_phase_relation_list_whole = []
     third_phase_relation_list_no_trigger = []
-    output_upos_whole = []
-    output_xpos_whole = []
+    output_upos_whole = {}
+    output_xpos_whole = {}
     trigger_word_candidate = []
     trigger_word_output = []
 
@@ -268,6 +268,7 @@ if __name__ == '__main__':
                             Filter:
                             * check if all entity are inside dictionary, if yes, eliminated
                             * eliminate if conclude more than one verb, or only one noun
+                            * eliminate if all dependencies are CCONJ
                             '''
                             temp_token_count = 0
                             temp_upos_count = 0
@@ -284,7 +285,7 @@ if __name__ == '__main__':
                                     temp_verb_count += 1
                             if temp_token_count == 3 or temp_upos_count < 2 or temp_verb_count > 1:
                                 continue
-                            elif "CCONJ" in upos and upos.count("CCONJ") == 1:
+                            elif "CCONJ" in upos and list(set(upos)).count("CCONJ") == 1:
                                 # if str(firstElement) != str(upos.index("CCONJ")) and str(secondElement) != str(
                                 #         upos.index("CCONJ")):
                                 # print(str(upos.index("CCONJ")))
@@ -302,8 +303,7 @@ if __name__ == '__main__':
                                                                           target=graphCandidatesA) + nx.shortest_path(
                                         graph_test,
                                         source=graphCandidatesA, target=graphCandidatesB)[1:]
-                                    predicate_index_list.append(
-                                        len(nx.shortest_path(graph_test, source=e_1, target=graphCandidatesA)) - 1)
+                                    predicate_index_list.append(len(nx.shortest_path(graph_test, source=e_1, target=graphCandidatesA)) - 1)
                                     result_list.append(shortest_path_list)
 
                             # construct output result
@@ -336,10 +336,7 @@ if __name__ == '__main__':
                                         searchingIndex] in CONTINUE_WORD_UPOS_LAST:
                                         edges[0] = edges[0] + tokens[searchingIndex]
 
-                                ''' debugging code '''
-                                # print("@@@", tokens[int(resultElement[0]) - 1])
-                                ''' ended '''
-
+                                ''' Predicate Session '''
                                 for path_index, path_element in enumerate(resultElement):
                                     if path_index + 1 == len(resultElement):
                                         continue
@@ -508,16 +505,13 @@ if __name__ == '__main__':
                                             third_phase_relation_list.append(basic_output_list)
                                             third_phase_relation_list_whole.append(edges)
                                             third_phase_relation_list_no_trigger.append(basic_output_list_no_trigger)
-                                            output_upos_whole.append(output_upos)
-                                            output_xpos_whole.append(output_xpos)
+                                            # output_upos_whole.append(output_upos)
+                                            # output_xpos_whole.append(output_xpos)
+                                            output_upos_whole["@".join(edges)] = output_upos
+                                            output_xpos_whole["@".join(edges)] = output_xpos
 
                                             # append trigger word candidate
                                             trigger_word_candidate.append(edges[predicate_location_in_edge])
-
-                                ''' debugging code '''
-                                # print(len(third_phase_relation_list))
-                                # print(len(third_phase_relation_list_whole))
-                                ''' ended '''
 
     ''' Enumerate relations & export '''
     # remove duplicates
@@ -545,6 +539,8 @@ if __name__ == '__main__':
 
     relation_whole_list = first_phase_relation_list_whole + second_phase_relation_list_whole + third_phase_relation_list_whole
     relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
+
+    print(len(relation_whole_list), len(relation_list), len(output_upos_whole))
 
     '''
     Filter: 
@@ -587,8 +583,8 @@ if __name__ == '__main__':
         if temp_basic_form in data_third_phase_candidate_filter:
             seed_output_whole.write("@".join(relationElement) + "\n")
             seed_output_only_relation.write("@".join(simple_relation_format) +
-                                            "|" + "@".join(output_upos_whole[relationIndex]) +
-                                            "|" + "@".join(output_xpos_whole[relationIndex]) + "\n")
+                                            "|" + "@".join(output_upos_whole["@".join(relationElement)]) +
+                                            "|" + "@".join(output_xpos_whole["@".join(relationElement)]) + "\n")
 
         # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
         # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")
