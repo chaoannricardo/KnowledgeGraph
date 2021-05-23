@@ -67,7 +67,7 @@ if __name__ == '__main__':
     CONTINUE_WORD_XPOS = []
     CONTINUE_SEARCHING_LIMIT = 2
     TOLERATE_DIFFERENCE = 3
-    THIRD_PHASE_COUNT_THERSHOLD = 30
+    THIRD_PHASE_COUNT_THERSHOLD = 150
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -220,18 +220,18 @@ if __name__ == '__main__':
                             object_inside.append(word.text)
                             object_inside_whole.append(word.text)
                             object_index_list.append(temp_index)
-                        else:
-                            # try to puzzle up neighboring chars to fulfill token requirement
-                            temp_checking_name = word.text
-                            # dict continuous searching from left
-                            for searchingIndex in range(wordIndex-1, -1, -1):
-                                temp_checking_name = (sent.words[searchingIndex].text + temp_checking_name)
-                                if temp_checking_name in object_list:
-                                    includeObject = True
-                                    print(temp_checking_name)
-                                    object_inside.append(word.text)
-                                    object_inside_whole.append(temp_checking_name)
-                                    object_index_list.append(temp_index)
+
+                        # try to puzzle up neighboring chars to fulfill token requirement
+                        temp_checking_name = word.text
+                        # dict continuous searching from left
+                        for searchingIndex in range(wordIndex - 1, -1, -1):
+                            temp_checking_name = (sent.words[searchingIndex].text + temp_checking_name)
+                            if temp_checking_name in object_list:
+                                includeObject = True
+                                # print(temp_checking_name)
+                                object_inside.append(word.text)
+                                object_inside_whole.append(temp_checking_name)
+                                object_index_list.append(temp_index)
 
                         temp_index += 1
 
@@ -244,6 +244,7 @@ if __name__ == '__main__':
                 # print(object_inside)
                 # print([tokens[i] for i in object_index_list])
                 # print("--------")
+                ''' Ended '''
 
                 ''' Construct graph object for further processing '''
                 # construct graph by networkx
@@ -565,7 +566,8 @@ if __name__ == '__main__':
     relation_whole_list = first_phase_relation_list_whole + second_phase_relation_list_whole + third_phase_relation_list_whole
     relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
 
-    print(len(relation_whole_list), len(relation_list), len(output_upos_whole))
+    print("Relation Triple Number:", len(relation_whole_list), "\nRelation Triple Number (Re-confirm):",
+          len(output_upos_whole), "\nBasic Relation Tupes:", len(relation_list))
 
     '''
     Filter: 
