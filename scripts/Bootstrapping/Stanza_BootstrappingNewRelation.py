@@ -20,28 +20,28 @@ import stanza
 if __name__ == '__main__':
     ''' Configurations '''
     # World Chronology Mandarin config
-    # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    # OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
-    # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-    # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
-    # NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
-
-    # semiconductor config
     BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     SUBJECT_DICT_PATH = ""  # not using subject dict path for now
     TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION.csv"
-    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_BASIC.csv"
-    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_WHOLE.csv"
-    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_TRIGGER_WORD.csv"
-    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_ONLY_RELATION.csv"
+    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
+    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION.csv"
+    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_BASIC.csv"
+    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_WHOLE.csv"
+    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
+    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
+
+    # semiconductor config
+    # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
+    # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
+    # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
+    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
+    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION.csv"
+    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_BASIC.csv"
+    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_WHOLE.csv"
+    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_TRIGGER_WORD.csv"
+    # NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_ONLY_RELATION.csv"
 
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     CONTINUE_WORD_XPOS = []
     CONTINUE_SEARCHING_LIMIT = 2
     TOLERATE_DIFFERENCE = 3
-    THIRD_PHASE_COUNT_THERSHOLD = 150
+    THIRD_PHASE_COUNT_THERSHOLD = 200
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -133,13 +133,6 @@ if __name__ == '__main__':
             # if lineIndex == 100:
             #     break
             ''' ended '''
-
-            ''' Special line to eliminate years for data '''
-            try:
-                line = line.split("：")[1]
-            except IndexError:
-                pass
-            ''' Special line finished '''
 
             ''' Preprocessing of text line '''
             # replace special chars in line
@@ -567,7 +560,7 @@ if __name__ == '__main__':
     relation_list = first_phase_relation_list + second_phase_relation_list + third_phase_relation_list
 
     print("Relation Triple Number:", len(relation_whole_list), "\nRelation Triple Number (Re-confirm):",
-          len(output_upos_whole), "\nBasic Relation Tupes:", len(relation_list))
+          len(output_upos_whole), "\nBasic Relation Tuples:", len(relation_list))
 
     '''
     Filter: 
