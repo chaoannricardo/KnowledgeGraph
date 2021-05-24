@@ -13,6 +13,7 @@ import codecs
 import itertools
 import networkx as nx
 import os
+import numpy as np
 import pandas as pd
 import re
 import stanza
@@ -67,7 +68,7 @@ if __name__ == '__main__':
     CONTINUE_WORD_XPOS = []
     CONTINUE_SEARCHING_LIMIT = 2
     TOLERATE_DIFFERENCE = 3
-    THIRD_PHASE_COUNT_THERSHOLD = 200
+    THIRD_PHASE_COUNT_THERSHOLD = 0.05
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -570,10 +571,13 @@ if __name__ == '__main__':
         "Candidate": ["@".join(relationElement) for relationElement in third_phase_relation_list_no_trigger]
     })
     data_third_phase_candidate_filter = data_third_phase_candidate.value_counts().reset_index()
-    data_third_phase_candidate_filter.to_csv("./temp.csv")
-    data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1] \
-                                                                          > THIRD_PHASE_COUNT_THERSHOLD].iloc[:,
-                                        0].tolist()
+    data_third_phase_candidate_filter.sort_values(by=[0], ascending=False, inplace=True)
+    data_third_phase_candidate_filter = data_third_phase_candidate_filter.iloc[:int(np.around((len(data_third_phase_candidate_filter) * THIRD_PHASE_COUNT_THERSHOLD),
+                                                                                     decimals=0)), 0].tolist()
+
+    # data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1] \
+    #                                                                       > THIRD_PHASE_COUNT_THERSHOLD].iloc[:,
+    #                                     0].tolist()
     ''' Filter Ended '''
 
     for relationIndex, relationElement in enumerate(relation_list):
