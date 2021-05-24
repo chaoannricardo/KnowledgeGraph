@@ -21,28 +21,30 @@ import stanza
 if __name__ == '__main__':
     ''' Configurations '''
     # World Chronology Mandarin config
-    BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
-    SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-    TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
-    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION.csv"
-    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_BASIC.csv"
-    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_RELATION_WHOLE.csv"
-    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_TRIGGER_WORD.csv"
-    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
-
-    # semiconductor config
     # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    # OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
+    # STOP_WORD_PATH = "../dicts/Stopwords/"
     # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
     # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_TRIGGER_WORD.csv"
-    # NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/210513_result/SEED_ONLY_RELATION.csv"
+    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
+    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION.csv"
+    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_BASIC.csv"
+    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_TRIGGER_WORD.csv"
+
+
+    # semiconductor config
+    BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
+    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    STOP_WORD_PATH = "../dicts/Stopwords/"
+    SUBJECT_DICT_PATH = ""  # not using subject dict path for now
+    TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
+    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
+    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION.csv"
+    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_BASIC.csv"
+    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
+    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_TRIGGER_WORD.csv"
+    NEW_SEED_ONLY_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_ONLY_RELATION.csv"
 
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
@@ -68,7 +70,7 @@ if __name__ == '__main__':
     CONTINUE_WORD_XPOS = []
     CONTINUE_SEARCHING_LIMIT = 2
     TOLERATE_DIFFERENCE = 3
-    THIRD_PHASE_COUNT_THERSHOLD = 0.05
+    THIRD_PHASE_COUNT_THERSHOLD = 0.01
     ITERATIONS = 10
 
     ''' Process Starts '''
@@ -79,14 +81,15 @@ if __name__ == '__main__':
     seed_output = codecs.open(NEW_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     seed_output_basic = codecs.open(NEW_BASIC_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     seed_output_whole = codecs.open(NEW_WHOLE_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
-    seed_output_only_relation = codecs.open(NEW_SEED_ONLY_RELATION, mode="w", encoding="utf8")
     trigger_word_output = codecs.open(NEW_TRIGGER_WORD_OUTPUT_PATH, mode="w", encoding="utf8")
 
     ''' Construct variables for bootstrapping '''
     seed_relation_list = []
     relation_location_index = []
     object_list = []
+    stopword_list = []
 
+    # set up entity object list
     for fileIndex, fileElement in enumerate(os.listdir(OBJECT_DICT_PATH)):
         object_dict = codecs.open(OBJECT_DICT_PATH + fileElement, mode="r", encoding="utf8", errors="ignore")
         temp = [line.replace("\r\n", "").replace("\n", "") for line in object_dict.readlines()]
@@ -98,6 +101,12 @@ if __name__ == '__main__':
         # relation_type = line.split("&")[1]
         seed_relation_list.append(relation_line)
         relation_location_index.append(relation_line.split("@").index("Predicate"))
+
+    # set up stop word list
+    for fileIndex, fileElement in enumerate(os.listdir(STOP_WORD_PATH)):
+        stopword_file = codecs.open(STOP_WORD_PATH + fileElement, mode="r", encoding="utf8", errors="ignore")
+        temp = [line.replace("\r\n", "").replace("\n", "") for line in stopword_file.readlines()]
+        stopword_list += temp
 
     seed_relation_list = list(set(seed_relation_list))  # remove duplicate seed relations
     seed_relation_list = [seed_relation_list[i].split("@") for i in range(len(seed_relation_list))]
@@ -260,8 +269,9 @@ if __name__ == '__main__':
                                     upos[int(firstElement) - 1] in NEGLECT_UPOS or upos[
                                 int(secondElement) - 1] in NEGLECT_UPOS or \
                                     xpos[int(firstElement) - 1] in NEGLECT_XPOS or xpos[
-                                int(secondElement) - 1] in NEGLECT_XPOS:
-                                # skip if element duplicate
+                                int(secondElement) - 1] in NEGLECT_XPOS or str(tokens[objectIndex]) in stopword_list or\
+                                    str(tokens[int(firstElement) - 1]) in stopword_list or\
+                                    str(tokens[int(secondElement) - 1]) in stopword_list:
                                 continue
                             else:
                                 ''' debugging code '''
@@ -605,10 +615,10 @@ if __name__ == '__main__':
         # only export if it's beyond threshold
         temp_basic_form = "@".join(temp_basic_form)
         if temp_basic_form in data_third_phase_candidate_filter:
-            seed_output_whole.write("@".join(relationElement) + "\n")
-            seed_output_only_relation.write("@".join(simple_relation_format) +
-                                            "|" + "@".join(output_upos_whole["@".join(relationElement)]) +
-                                            "|" + "@".join(output_xpos_whole["@".join(relationElement)]) + "\n")
+            seed_output_whole.write("@".join(relationElement) +
+                                    "|" + "@".join(simple_relation_format) +
+                                    "|" + "@".join(output_upos_whole["@".join(relationElement)]) +
+                                    "|" + "@".join(output_xpos_whole["@".join(relationElement)]) + "\n")
 
         # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
         # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")

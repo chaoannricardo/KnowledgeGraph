@@ -20,7 +20,9 @@ import random
 
 if __name__ == '__main__':
     ''' Configurations '''
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/210426_result/SEED_ONLY_RELATION.csv"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+
     OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
@@ -73,9 +75,9 @@ if __name__ == '__main__':
               "\nCONTRUCTED TUPLES:", len(graph_entity_word_list ), "\n===================================")
 
         for lineIndex, line in enumerate(lines):
-            relation_element = line.split("|")[0].split("@")
-            upos_element = line.split("|")[1].split("@")
-            xpos_element = line.split("|")[2].split("@")
+            relation_element = line.split("|")[1].split("@")
+            upos_element = line.split("|")[2].split("@")
+            xpos_element = line.split("|")[3].split("@")
             entity_tokens = []
             relation_tokens = []
 
@@ -84,6 +86,8 @@ if __name__ == '__main__':
                 if relationElement in entity_list:
                     entity_tokens.append(relationElement)
                 elif relationElement in relation_list:
+                    relation_tokens.append(relationElement)
+                elif upos_element[relationElementIndex] in ["VERB"]:
                     relation_tokens.append(relationElement)
 
             # second iteration if possible
