@@ -67,12 +67,14 @@ if __name__ == '__main__':
 
     random.shuffle(lines)
 
+    relation_triple_constructed_num = 0
     while iteration < ITERATION:
         iteration += 1
+        constructed_triples_this_iteration = 0
 
         print("ITERATION:", iteration, "REMAINING LINES:", len(lines), "\nENTITIY NUMS:",
               len(entity_list), "RELATION NUMS:", len(relation_list),
-              "\nCONTRUCTED TUPLES:", len(graph_entity_word_list ), "\n===================================")
+              "\nCONTRUCTED TUPLES:", len(graph_entity_word_list ))
 
         for lineIndex, line in enumerate(lines):
             relation_element = line.split("|")[1].split("@")
@@ -105,9 +107,17 @@ if __name__ == '__main__':
                 graph_entity_word_list.append((entity_tokens[0], entity_tokens[1]))
                 graph_trigger_word_dict[(entity_tokens[0], entity_tokens[1])] = relation_tokens[0]
                 lines.remove(line)
+                constructed_triples_this_iteration += 1
 
+        # remove duplicates
         entity_list = list(set(entity_list))
         relation_list = list(set(relation_list))
+        print("New Added Relation Triples:", [str(graph_entity_word_list[i]) + " " +\
+                                              str(graph_trigger_word_dict[graph_entity_word_list[i]]) \
+                                              for i in range(relation_triple_constructed_num,
+                                                             len(graph_entity_word_list))],
+              "\n===================================")
+        relation_triple_constructed_num += constructed_triples_this_iteration
 
     ''' Construct Graph Phase '''
     if RELATIONS_TO_PLOT != "ALL":
