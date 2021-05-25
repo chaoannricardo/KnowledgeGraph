@@ -60,8 +60,8 @@ if __name__ == '__main__':
                     "＞", "〕", "】", "〗", "》", "〉", "\r\n", "ˋ"]
     PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
     CONJUCTION_CHAR = ["的", "之", "及", "與", "等", "前"]
-    NEGLECT_CAHR = ["「", "」", " ", "\n", "-", "——", "?"]
-    NEGLECT_UPOS = ["PART", "PFA", "NUM"]
+    NEGLECT_CHAR = ["「", "」", " ", "\n", "-", "——", "?"]
+    NEGLECT_UPOS = ["PART", "PFA", "NUM", "CCONJ"]
     NEGLECT_XPOS = ["SFN"]
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
     CONTINUE_WORD_UPOS_FIRST = ["PROPN", "ADJ"]  # "NOUN"
@@ -130,6 +130,7 @@ if __name__ == '__main__':
     output_xpos_whole = {}
     trigger_word_candidate = []
     trigger_word_output = []
+    debug_list = []
 
     for fileIndex, fileElement in enumerate(os.listdir(DATA_IMPORT_PATH)):
 
@@ -138,22 +139,16 @@ if __name__ == '__main__':
         ''' Enumerate over file lines '''
         for lineIndex, line in enumerate(tqdm(data_import.readlines())):
 
-            ''' debugging part '''
-            # if lineIndex == 100:
-            #     break
-            ''' ended '''
-
             ''' Preprocessing of text line '''
-            # replace special chars in line
+            # replace special chars in line into "，"
             for charIndex, charElement in enumerate(REPLACE_CHAR):
                 line = line.replace(charElement, "，")
 
-            for charIndex, charElement in enumerate(NEGLECT_CAHR):
+            # eliminate char to neglect
+            for charIndex, charElement in enumerate(NEGLECT_CHAR):
                 line = line.replace(charElement, "")
 
-            if line[0] == "，":
-                line = line[1:]
-
+            # minor adjust sentence format of data
             line_split = [line[i] for i in range(len(line))]
             for charIndex, charElement in enumerate(line_split):
                 if (charIndex + 1) == len(line):
@@ -165,6 +160,8 @@ if __name__ == '__main__':
                 continue
 
             line = "".join(line_split)
+            if line[0] == "，":
+                line = line[1:]
             if line[-1] in PUNT_CHAR:
                 line = line[:-1]
             ''' ended '''
@@ -257,8 +254,36 @@ if __name__ == '__main__':
                     for firstIndex, firstElement in enumerate(ids):
                         for secondIndex, secondElement in enumerate(ids):
 
+                            e_1 = str(ids[objectIndex])
+                            e_1_pos = ""
+                            e_2 = str(firstElement)
+                            e_2_pos = ""
+                            e_3 = str(secondElement)
+                            e_3_pos = ""
+
                             predicate_index_list = []
                             result_list = []
+                            temp_token_count = 0
+                            temp_upos_count = 0
+                            temp_verb_count = 0
+
+                            ''' 
+                            Filter:
+                            * check if all entity are inside dictionary, if yes, eliminated
+                            * eliminate if conclude more than one verb, or only one noun
+                            * eliminate if conj is inside upos
+                            * eliminate if all dependencies are CCONJ
+                            '''
+
+                            for temp_index in [(int(e_1) - 1), (int(e_2) - 1), (int(e_3) - 1)]:
+                                # entity in object list check
+                                if tokens[temp_index] in object_list:
+                                    temp_token_count += 1
+                                # upos contain verb check
+                                if upos[temp_index] in NOUN_ENTITY_UPOS:
+                                    temp_upos_count += 1
+                                elif upos[temp_index] in ["VERB"]:
+                                    temp_verb_count += 1
 
                             if firstIndex == secondIndex or firstIndex == objectIndex or objectIndex == secondIndex or \
                                     len(str(tokens[int(firstElement) - 1])) < 2 or len(
@@ -270,48 +295,14 @@ if __name__ == '__main__':
                                     xpos[int(firstElement) - 1] in NEGLECT_XPOS or xpos[
                                 int(secondElement) - 1] in NEGLECT_XPOS or str(tokens[objectIndex]) in stopword_list or\
                                     str(tokens[int(firstElement) - 1]) in stopword_list or\
-                                    str(tokens[int(secondElement) - 1]) in stopword_list:
+                                    str(tokens[int(secondElement) - 1]) in stopword_list or\
+                                    (temp_token_count == 3) or (temp_upos_count < 2) or (temp_verb_count > 1):
                                 continue
                             else:
                                 ''' debugging code '''
                                 # print("!!!", tokens[object_index])
                                 # print("@@@", tokens[int(ids[object_index]) - 1])
                                 ''' ended '''
-
-                                e_1 = str(ids[objectIndex])
-                                e_1_pos = ""
-                                e_2 = str(firstElement)
-                                e_2_pos = ""
-                                e_3 = str(secondElement)
-                                e_3_pos = ""
-
-                                ''' 
-                                Filter:
-                                * check if all entity are inside dictionary, if yes, eliminated
-                                * eliminate if conclude more than one verb, or only one noun
-                                * eliminate if all dependencies are CCONJ
-                                '''
-                                temp_token_count = 0
-                                temp_upos_count = 0
-                                temp_verb_count = 0
-
-                                for temp_index in [(int(e_1) - 1), (int(e_2) - 1), (int(e_3) - 1)]:
-                                    # entity in object list check
-                                    if tokens[temp_index] in object_list:
-                                        temp_token_count += 1
-                                    # upos contain verb check
-                                    if upos[temp_index] in NOUN_ENTITY_UPOS:
-                                        temp_upos_count += 1
-                                    elif upos[temp_index] in ["VERB"]:
-                                        temp_verb_count += 1
-                                if temp_token_count == 3 or temp_upos_count < 2 or temp_verb_count > 1:
-                                    continue
-                                elif "CCONJ" in upos and list(set(upos)).count("CCONJ") == 1:
-                                    # if str(firstElement) != str(upos.index("CCONJ")) and str(secondElement) != str(
-                                    #         upos.index("CCONJ")):
-                                    # print(str(upos.index("CCONJ")))
-                                    continue
-                                ''' Filter Ended '''
 
                                 for constuctionIndexA, graphCandidatesA in enumerate([e_2, e_3]):
                                     for constuctionIndexB, graphCandidatesB in enumerate([e_2, e_3]):
@@ -341,22 +332,6 @@ if __name__ == '__main__':
                                     edges = [object_inside_whole[objectIndexInList]]
                                     output_upos = [upos[first_token_index]]
                                     output_xpos = [xpos[first_token_index]]
-
-                                    # # searching left
-                                    # for searchingIndex in range((first_token_index - 1), left_searching_limit, -1):
-                                    #     if upos[first_token_index] not in NOUN_ENTITY_UPOS:
-                                    #         break
-                                    #     elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
-                                    #         searchingIndex] in CONTINUE_WORD_UPOS_FIRST:
-                                    #         edges[0] = tokens[searchingIndex] + edges[0]
-                                    #
-                                    # # searching right
-                                    # for searchingIndex in range((first_token_index + 1), right_searching_limit):
-                                    #     if upos[first_token_index] not in NOUN_ENTITY_UPOS:
-                                    #         break
-                                    #     elif xpos[searchingIndex] in CONTINUE_WORD_XPOS or upos[
-                                    #         searchingIndex] in CONTINUE_WORD_UPOS_LAST:
-                                    #         edges[0] = edges[0] + tokens[searchingIndex]
 
                                     ''' Predicate Session '''
                                     for path_index, path_element in enumerate(resultElement):
@@ -466,13 +441,11 @@ if __name__ == '__main__':
                                     Filter:
                                     * skip if two entities are same
                                     * if dependencies only conclude conj
+                                    * if dependecies only include on type of dependency
                                     * again eliminate relation triple that is too short
                                     '''
                                     dependency_list = edges[1:-1].copy()
-                                    dependency_list[predicate_location_in_edge - 1] = "conj"
-
-                                    # if edges[0] == "奧地利":
-                                    #     print(dependency_list)
+                                    del dependency_list[predicate_location_in_edge - 1]
 
                                     if len(list({edges[0], edges[predicate_location_in_edge], edges[-1]})) < 3 or \
                                             edges[0] in edges[predicate_location_in_edge] or edges[
@@ -481,7 +454,8 @@ if __name__ == '__main__':
                                         predicate_location_in_edge] in edges[-1] or \
                                             edges[-1] in edges[0] or edges[0] in edges[-1] or \
                                             (len(list(set(dependency_list))) == 1 and "conj" in dependency_list) or \
-                                            len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or \
+                                            (len(list(set(dependency_list))) == 1 or\
+                                        len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or \
                                             len(str(edges[predicate_location_in_edge])) < 2:
                                         continue
                                     ''' Filter Ended '''
@@ -530,17 +504,15 @@ if __name__ == '__main__':
                                             elif difference <= TOLERATE_DIFFERENCE and is_predicate_same is not True:
                                                 third_phase_relation_list.append(basic_output_list)
                                                 third_phase_relation_list_whole.append(edges)
-                                                third_phase_relation_list_no_trigger.append(
-                                                    basic_output_list_no_trigger)
-                                                # output_upos_whole.append(output_upos)
-                                                # output_xpos_whole.append(output_xpos)
+                                                third_phase_relation_list_no_trigger.append(basic_output_list_no_trigger)
                                                 output_upos_whole["@".join(edges)] = output_upos
                                                 output_xpos_whole["@".join(edges)] = output_xpos
 
                                                 # append trigger word candidate
                                                 trigger_word_candidate.append(edges[predicate_location_in_edge])
 
-
+                                                if len(list(set(dependency_list))) == 1:
+                                                    debug_list.append(edges)
 
     ''' Enumerate relations & export '''
     # remove duplicates
@@ -621,3 +593,9 @@ if __name__ == '__main__':
 
         # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
         # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")
+
+    debug_list.sort()
+    debug_list = list(k for k, _ in itertools.groupby(debug_list))
+
+    for listItem in debug_list:
+        print(listItem)
