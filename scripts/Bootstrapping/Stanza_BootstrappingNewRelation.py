@@ -442,7 +442,7 @@ if __name__ == '__main__':
                                     * skip if two entities are same
                                     * if dependencies only conclude conj
                                     * if dependecies only include on type of dependency
-                                    * again eliminate relation triple that is too short
+                                    * again eliminate relation triple with word that is too short
                                     '''
                                     dependency_list = edges[1:-1].copy()
                                     del dependency_list[predicate_location_in_edge - 1]
@@ -454,8 +454,8 @@ if __name__ == '__main__':
                                         predicate_location_in_edge] in edges[-1] or \
                                             edges[-1] in edges[0] or edges[0] in edges[-1] or \
                                             (len(list(set(dependency_list))) == 1 and "conj" in dependency_list) or \
-                                            (len(list(set(dependency_list))) == 1 or\
-                                        len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or \
+                                            (len(list(set(dependency_list)))) == 1 or\
+                                            len(str(edges[0])) < 2 or len(str(edges[-1])) < 2 or\
                                             len(str(edges[predicate_location_in_edge])) < 2:
                                         continue
                                     ''' Filter Ended '''

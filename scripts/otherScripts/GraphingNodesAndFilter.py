@@ -11,22 +11,26 @@ Adding Clauses: font.sans-serif : Microsoft JhengHei, DejaVu Sans, Bitstream Ver
 """
 from matplotlib.font_manager import findfont, FontProperties
 from tqdm import tqdm
+from zhconv import convert
 import codecs
 import matplotlib.pyplot as plt
 import networkx as nx
 import os
 import random
-
+import requests
+import sys
+import time
 
 if __name__ == '__main__':
     ''' Configurations '''
-    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
 
     OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
     RELATIONS_TO_PLOT = 40  # "ALL"
+    RECOGNIZED_EXISTING_WORD_FREQUENCY = 10
     ITERATION = 10
     plt.rcParams.update({'font.family': 'Microsoft JhengHei'})
     plt.figure(figsize=(50, 50))
@@ -40,15 +44,17 @@ if __name__ == '__main__':
     relation_list = []
     element_to_deal_last = []
     entity_list = []
+    new_word_candidate_count_dict = {}
+    cn_probase_dict = {}
+    iteration = 0
     # variables to construct graph
     graph_trigger_word_dict = {}
     graph_entity_word_list = []
-    iteration = 0
 
     # create object list
     for fileIndex, fileElement in enumerate(os.listdir(OBJECT_DICT_PATH)):
         object_dict = codecs.open(OBJECT_DICT_PATH + fileElement, mode="r", encoding="utf8", errors="ignore")
-        temp = [line.replace("\r\n", "").replace("\n", "")  for line in object_dict.readlines()]
+        temp = [line.replace("\r\n", "").replace("\n", "") for line in object_dict.readlines()]
         entity_list += temp
 
     # create relation list
@@ -74,7 +80,7 @@ if __name__ == '__main__':
 
         print("ITERATION:", iteration, "REMAINING LINES:", len(lines), "\nENTITIY NUMS:",
               len(entity_list), "RELATION NUMS:", len(relation_list),
-              "\nCONTRUCTED TUPLES:", len(graph_entity_word_list ))
+              "\nCONTRUCTED TUPLES:", len(graph_entity_word_list))
 
         for lineIndex, line in enumerate(lines):
             relation_element = line.split("|")[1].split("@")
@@ -82,21 +88,63 @@ if __name__ == '__main__':
             xpos_element = line.split("|")[3].split("@")
             entity_tokens = []
             relation_tokens = []
-
             # first iteration checking entity and relation that is inside the list
             for relationElementIndex, relationElement in enumerate(relation_element):
                 if relationElement in entity_list:
                     entity_tokens.append(relationElement)
                 elif relationElement in relation_list:
                     relation_tokens.append(relationElement)
-                elif upos_element[relationElementIndex] in ["VERB"]:
-                    relation_tokens.append(relationElement)
+                else:
+                    ''' query to check if inside CN-Probase '''
+                    # query unseen word in first iteration
+                    if iteration == 1:
+                        if relationElement not in cn_probase_dict.keys():
+                            query_word_simplified = convert(relationElement, 'zh-hans')
+                            retry_count = 0
+                            while True:
+                                r = requests.get(
+                                    "http://shuyantech.com/api/cnprobase/ment2ent?q=" + query_word_simplified,
+                                    verify=False)
+                                result_json = r.json()
+                                if result_json["status"] == "ok":
+                                    cn_probase_dict[relationElement] = result_json["ret"]
+                                    retry_count = 0
+                                    break
+                                else:
+                                    # wait 10 seconds and reconnect when can not connect to CN-Probase
+                                    if retry_count >= 10:
+                                        print("Retry connection over 10 times, program terminated.")
+                                        sys.exit(0)
+                                    else:
+                                        print("Could not connect to CN-Probase, reconnect again in 10 seconds.")
+                                        time.sleep(10)
+                                        retry_count += 1
+                        else:
+                            if len(cn_probase_dict[relationElement]) == 0:
+                                if relationElement not in new_word_candidate_count_dict.keys():
+                                    new_word_candidate_count_dict[relationElement] = 0
+                                else:
+                                    new_word_candidate_count_dict[relationElement] += 1
 
-            # second iteration if possible
+                    try:
+                        if len(cn_probase_dict[relationElement]) > 0 or \
+                                (relationElement in new_word_candidate_count_dict.keys() and
+                                 new_word_candidate_count_dict[relationElement] >= RECOGNIZED_EXISTING_WORD_FREQUENCY):
+                            if upos_element[relationElementIndex] in ["VERB"]:
+                                relation_tokens.append(relationElement)
+                                print(relationElement)
+                    except KeyError:
+                        pass
+
+            # second loop to find new relation and entity
             if len(entity_tokens + relation_tokens) == 2:
                 for relationElementIndex, relationElement in enumerate(relation_element):
-                    if relationElement not in entity_tokens and relationElement not in relation_tokens:
-                        if len(entity_tokens) == 1 and len(relation_tokens) == 1:
+                    if (relationElement not in entity_tokens) and (relationElement not in relation_tokens) and \
+                            ((relationElement in cn_probase_dict.keys() and (len(cn_probase_dict[relationElement]) > 0)
+                              or ((relationElement in new_word_candidate_count_dict.keys() and
+                             new_word_candidate_count_dict[relationElement] >= RECOGNIZED_EXISTING_WORD_FREQUENCY)))):
+                        if len(entity_tokens) == 1 and len(relation_tokens) == 1 and \
+                                upos_element[relationElementIndex] not in ["VERB"]:
                             entity_tokens.append(relationElement)
                         elif len(entity_tokens) == 2:
                             relation_tokens.append(relationElement)
@@ -112,7 +160,7 @@ if __name__ == '__main__':
         # remove duplicates
         entity_list = list(set(entity_list))
         relation_list = list(set(relation_list))
-        print("New Added Relation Triples:", [str(graph_entity_word_list[i]) + " " +\
+        print("New Added Relation Triples:", [str(graph_entity_word_list[i]) + " " + \
                                               str(graph_trigger_word_dict[graph_entity_word_list[i]]) \
                                               for i in range(relation_triple_constructed_num,
                                                              len(graph_entity_word_list))],
@@ -149,12 +197,3 @@ if __name__ == '__main__':
           relation_list, len(relation_list))
 
     plt.show()
-
-
-
-
-
-
-
-
-

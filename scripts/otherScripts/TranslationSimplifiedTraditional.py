@@ -1,4 +1,9 @@
 # -*- coding: utf8 -*-
+"""
+Reference:
+* https://github.com/gumblex/zhconv
+
+"""
 from tqdm import tqdm
 from zhconv import convert
 import codecs
