@@ -7,6 +7,8 @@ Font Path: (Configuration Reference: https://reurl.cc/Q70DNq)
 Some Other Reference:
 * https://stackoverflow.com/questions/47094949/labeling-edges-in-networkx
 
+plt.savefig('Error_SDx.svg', format='svg', bbox_inches="tight")
+
 Adding Clauses: font.sans-serif : Microsoft JhengHei, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 """
 from matplotlib.font_manager import findfont, FontProperties
