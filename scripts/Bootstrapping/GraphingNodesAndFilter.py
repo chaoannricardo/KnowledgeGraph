@@ -25,8 +25,11 @@ import time
 
 if __name__ == '__main__':
     ''' Configurations '''
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
+
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
 
     OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
@@ -42,6 +45,7 @@ if __name__ == '__main__':
 
     ''' Process Starts '''
     data_import = codecs.open(LOAD_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
+    data_export = codecs.open(OUTPUT_PATH, mode="w", encoding="utf8")
     G = nx.DiGraph()
     relation_list = []
     element_to_deal_last = []
@@ -119,7 +123,7 @@ if __name__ == '__main__':
                                         sys.exit(0)
                                     else:
                                         print("Could not connect to CN-Probase, reconnect again in 10 seconds.")
-                                        time.sleep(10)
+                                        time.sleep(600)
                                         retry_count += 1
                         else:
                             if len(cn_probase_dict[relationElement]) == 0:
@@ -168,6 +172,10 @@ if __name__ == '__main__':
                                                              len(graph_entity_word_list))],
               "\n===================================")
         relation_triple_constructed_num += constructed_triples_this_iteration
+
+    ''' Export Phase '''
+    for key in graph_trigger_word_dict.keys():
+        data_export.write(key[0] + "@" + graph_trigger_word_dict[key] + "@" + key[1] + "\n")
 
     ''' Construct Graph Phase '''
     if RELATIONS_TO_PLOT != "ALL":
