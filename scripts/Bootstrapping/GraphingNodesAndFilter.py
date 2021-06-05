@@ -25,17 +25,22 @@ import time
 
 if __name__ == '__main__':
     ''' Configurations '''
-    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
+    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/NEW_ENTITY.csv"
+    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/NEW_RELATION.csv"
 
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
-    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
+    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_ENTITY.csv"
+    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_RELATION.csv"
 
     OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
     RELATIONS_TO_PLOT = 40  # "ALL"
     RECOGNIZED_EXISTING_WORD_FREQUENCY = 10
+    RECONNECT_SECONDS = 1200
     ITERATION = 10
     plt.rcParams.update({'font.family': 'Microsoft JhengHei'})
     plt.figure(figsize=(50, 50))
@@ -46,6 +51,8 @@ if __name__ == '__main__':
     ''' Process Starts '''
     data_import = codecs.open(LOAD_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
     data_export = codecs.open(OUTPUT_PATH, mode="w", encoding="utf8")
+    data_entity = codecs.open(OUTPUT_ENTITY, mode="w", encoding="utf8")
+    data_relation = codecs.open(OUTPUT_RELATION, mode="w", encoding="utf8")
     G = nx.DiGraph()
     relation_list = []
     element_to_deal_last = []
@@ -122,8 +129,8 @@ if __name__ == '__main__':
                                         print("Retry connection over 10 times, program terminated.")
                                         sys.exit(0)
                                     else:
-                                        print("Could not connect to CN-Probase, reconnect again in 10 seconds.")
-                                        time.sleep(600)
+                                        print("Could not connect to CN-Probase, reconnect again in " + str(RECONNECT_SECONDS) + " seconds.")
+                                        time.sleep(RECONNECT_SECONDS)
                                         retry_count += 1
                         else:
                             if len(cn_probase_dict[relationElement]) == 0:
@@ -176,6 +183,12 @@ if __name__ == '__main__':
     ''' Export Phase '''
     for key in graph_trigger_word_dict.keys():
         data_export.write(key[0] + "@" + graph_trigger_word_dict[key] + "@" + key[1] + "\n")
+
+    for entity in entity_list:
+        data_entity.write(entity + "\n")
+
+    for relation in relation_list:
+        data_relation.write(relation + "\n")
 
     ''' Construct Graph Phase '''
     if RELATIONS_TO_PLOT != "ALL":
