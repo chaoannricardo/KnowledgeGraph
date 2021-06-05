@@ -1,0 +1,158 @@
+# -*- coding: utf8 -*-
+
+from matplotlib.font_manager IMPORT findfont, FontProperties
+
+from tqdm IMPORT tqdm
+
+from zhconv IMPORT convert
+
+IMPORT codecs
+
+IMPORT matplotlib.pyplot as plt
+
+IMPORT networkx as nx
+
+IMPORT os
+
+IMPORT random
+
+IMPORT requests
+
+IMPORT sys
+
+IMPORT time
+
+
+
+IF __name__ EQUALS '__main__':
+
+    ''' Configurations '''
+
+    SET LOAD_RELATION_PATH TO "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+
+    SET # LOAD_RELATION_PATH TO "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+
+
+
+    SET OBJECT_DICT_PATH TO "../dicts/WorldChronolgy/EntityDict/"
+
+    SET RELATION_DICT_PATH TO "../dicts/WorldChronolgy/RelationDict/"
+
+    SET NOUN_ENTITY_UPOS TO ["PROPN", "NOUN", "PART"]
+
+    SET RECOGNIZED_EXISTING_WORD_FREQUENCY TO 10
+
+    SET ITERATION TO 10
+
+
+
+    # show font type
+
+    # OUTPUT(findfont(FontProperties(family=FontProperties().get_family())))
+
+
+
+    ''' Process Starts '''
+
+    SET data_import TO codecs.open(LOAD_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
+
+    SET G TO nx.DiGraph()
+
+    SET relation_list TO []
+
+    SET element_to_deal_last TO []
+
+    SET entity_list TO []
+
+    SET iteration TO 0
+
+
+
+
+
+    SET relation_triple_constructed_num TO 0
+
+    WHILE iteration < ITERATION:
+
+        iteration += 1
+
+        SET constructed_triples_this_iteration TO 0
+
+
+
+        FOR lineIndex, line IN enumerate(lines):
+
+            SET relation_element TO line.split("|")[1].split("@")
+
+            SET upos_element TO line.split("|")[2].split("@")
+
+            SET xpos_element TO line.split("|")[3].split("@")
+
+            SET entity_tokens TO []
+
+            SET relation_tokens TO []
+
+            # first iteration checking entity and relation that is inside the list
+
+            FOR relationElementIndex, relationElement IN enumerate(relation_element):
+
+                IF relationElement IN entity_list:
+
+                    entity_tokens.append(relationElement)
+
+                ELSEIF relationElement IN relation_list:
+
+                    relation_tokens.append(relationElement)
+
+
+
+            # second loop to find new relation and entity
+
+            IF len(entity_tokens + relation_tokens) EQUALS 2:
+
+                FOR relationElementIndex, relationElement IN enumerate(relation_element):
+
+                    IF (relationElement not IN entity_tokens) and (relationElement not IN relation_tokens) and \
+
+                            ((relationElement IN cn_probase_dict.keys() and (len(cn_probase_dict[relationElement]) > 0)
+
+                              or ((relationElement IN new_word_candidate_count_dict.keys() and
+
+                             new_word_candidate_count_dict[relationElement] >= RECOGNIZED_EXISTING_WORD_FREQUENCY)))):
+
+                        IF len(entity_tokens) EQUALS 1 and len(relation_tokens) EQUALS 1 and \
+
+                                upos_element[relationElementIndex] not IN ["VERB"]:
+
+                            entity_tokens.append(relationElement)
+
+                        ELSEIF len(entity_tokens) EQUALS 2:
+
+                            relation_tokens.append(relationElement)
+
+
+
+            IF len(entity_tokens) EQUALS 2 and len(relation_tokens) EQUALS 1:
+
+                entity_list += entity_tokens
+
+                relation_list += relation_tokens
+
+                graph_entity_word_list.append((entity_tokens[0], entity_tokens[1]))
+
+                SET graph_trigger_word_dict[(entity_tokens[0], entity_tokens[1])] TO relation_tokens[0]
+
+                lines.remove(line)
+
+                constructed_triples_this_iteration += 1
+
+
+
+        # remove duplicates
+
+        SET entity_list TO list(set(entity_list))
+
+        SET relation_list TO list(set(relation_list))
+
+        relation_triple_constructed_num += constructed_triples_this_iteration
+

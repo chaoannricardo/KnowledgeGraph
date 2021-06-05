@@ -1,7 +1,10 @@
 # -*- coding: utf8 -*-
+"""
+https://gist.github.com/BlueNexus/599962d03a1b52a8d5f595dabd51dc34
+"""
 import re
 
-python_file = 'file.py'
+python_file = 'GraphingNodesAndFilter_PusedoCode.py'
 work_file = None
 
 basic_conversion_rules = {"for": "FOR", "=": "TO", "if": "IF", "==": "EQUALS", "while": "WHILE", "until": "UNTIL",
