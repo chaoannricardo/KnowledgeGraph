@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Graph Visualization</title>
+  <script src="https://unpkg.com/d3-force-3d"></script>
+</head>
+
+<body>
+  <div id="3d-graph"></div>
+
+  <script>
+    const Graph = ForceGraph3D()
+      (document.getElementById('3d-graph'))
+      .jsonUrl('./datasets/miserables.json')
+      .nodeLabel('id')
+      .nodeAutoColorBy('group');
+  </script>
+
+</body>
+
+</html>
