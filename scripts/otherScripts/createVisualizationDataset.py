@@ -5,10 +5,10 @@ import os
 
 if __name__ == '__main__':
     ''' Configurations '''
-    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    # DATA_EXPORT_PATH = "../../visualization/example/datasets/WorldChronology.json"
-    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
-    DATA_EXPORT_PATH = "../../visualization/example/datasets/WorldChronologyAll.json"
+    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    DATA_EXPORT_PATH = "../../visualization/example _WorldChronology/datasets/WorldChronology.json"
+    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    # DATA_EXPORT_PATH = "../../visualization/example _WorldChronologyAll/datasets/WorldChronologyAll.json"
 
     ''' Process Starts '''
     relation_triple_list = []
@@ -73,9 +73,18 @@ if __name__ == '__main__':
 
     for relation_triple_index, relation_triple in enumerate(relation_triple_list):
         if relation_triple_index != len(relation_triple_list) - 1:
-            data_export.write("{\"source\": \"" + relation_triple[0] + "\", \"target\": \"" + relation_triple[2] + "\", \"value\": 5},\n")
+            data_export.write("{\"source\": \"" + relation_triple[0] + "\", \"target\": \"" + relation_triple[2] +\
+                              "\", \"value\": 5, \"text\": \"" + relation_triple_text_dict[(relation_triple[0], relation_triple[2])] + "\"},\n")
         else:
             data_export.write("{\"source\": \"" + relation_triple[0] + "\", \"target\": \"" + relation_triple[2] + "\", \"value\": 5}\n]\n}")
+
+
+    # for relation_triple_index, relation_triple in enumerate(relation_triple_list):
+    #     if relation_triple_index != len(relation_triple_list) - 1:
+    #         data_export.write("{\"source\": \"" + relation_triple[0] + "\", \"target\": \"" + relation_triple[2] + "\", \"value\": 5},\n")
+    #     else:
+    #         data_export.write("{\"source\": \"" + relation_triple[0] + "\", \"target\": \"" + relation_triple[2] + "\", \"value\": 5}\n]\n}")
+
 
 
 
