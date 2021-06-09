@@ -298,7 +298,8 @@ if __name__ == '__main__':
                                 int(secondElement) - 1] in NEGLECT_XPOS or str(tokens[objectIndex]) in stopword_list or\
                                     str(tokens[int(firstElement) - 1]) in stopword_list or\
                                     str(tokens[int(secondElement) - 1]) in stopword_list or\
-                                    (temp_token_count == 3) or (temp_upos_count < 2) or (temp_verb_count > 1) or (temp_verb_count == 0):
+                                    (temp_token_count == 3) or (temp_upos_count < 2) or (temp_verb_count > 1):
+                                # or (temp_verb_count == 0)
                                 continue
                             else:
                                 ''' debugging code '''
