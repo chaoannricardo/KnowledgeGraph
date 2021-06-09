@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # summarize with counts of each entity
     for line in data_import.readlines():
-        relation_triple = line.split("@")
+        relation_triple = line.replace("\n", "").replace("\r\n", "").split("@")
         relation_triple_list.append(relation_triple)
 
         # adding count of occurence of entity
