@@ -29,11 +29,13 @@ if __name__ == '__main__':
     OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
     OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/NEW_ENTITY.csv"
     OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/NEW_RELATION.csv"
+    EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
 
     # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
     # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
     # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_ENTITY.csv"
     # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_RELATION.csv"
+    # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
 
     OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
@@ -49,6 +51,7 @@ if __name__ == '__main__':
     # print(findfont(FontProperties(family=FontProperties().get_family())))
 
     ''' Process Starts '''
+    data_external_KG = codecs.open(EXTERNAL_KG_SAVING_PATH, mode="r", encoding="utf8", errors="ignore")
     data_import = codecs.open(LOAD_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
     data_export = codecs.open(OUTPUT_PATH, mode="w", encoding="utf8")
     data_entity = codecs.open(OUTPUT_ENTITY, mode="w", encoding="utf8")
@@ -75,6 +78,14 @@ if __name__ == '__main__':
         relation_dict = codecs.open(RELATION_DICT_PATH + fileElement, mode="r", encoding="utf8", errors="ignore")
         temp = [line.replace("\r\n", "").replace("\n", "") for line in relation_dict.readlines()]
         relation_list += temp
+
+    # create external KG Dict
+    for line in data_external_KG.readlines():
+        cn_probase_dict[line.split("@")[0]] = line.split("@")[1]
+
+    # close file, and reopen to add new queries
+    data_external_KG.close()
+    data_external_KG = codecs.open(EXTERNAL_KG_SAVING_PATH, mode="a", encoding="utf8")
 
     entity_list = list(set(entity_list))
     relation_list = list(set(relation_list))
@@ -121,6 +132,8 @@ if __name__ == '__main__':
                                 result_json = r.json()
                                 if result_json["status"] == "ok":
                                     cn_probase_dict[relationElement] = result_json["ret"]
+                                    # add new query result into CN_Probase query result file
+                                    data_external_KG.write(str(relationElement) + "@" + str(result_json["ret"]) + "\n")
                                     retry_count = 0
                                     break
                                 else:

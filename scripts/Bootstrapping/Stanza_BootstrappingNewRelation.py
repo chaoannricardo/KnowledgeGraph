@@ -24,6 +24,7 @@ if __name__ == '__main__':
     BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
     OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
     STOP_WORD_PATH = "../dicts/Stopwords/"
+    EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
     SUBJECT_DICT_PATH = ""  # not using subject dict path for now
     TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
     DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
@@ -36,6 +37,7 @@ if __name__ == '__main__':
     # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
     # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
     # STOP_WORD_PATH = "../dicts/Stopwords/"
+    # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
     # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
     # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
     # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
@@ -296,7 +298,7 @@ if __name__ == '__main__':
                                 int(secondElement) - 1] in NEGLECT_XPOS or str(tokens[objectIndex]) in stopword_list or\
                                     str(tokens[int(firstElement) - 1]) in stopword_list or\
                                     str(tokens[int(secondElement) - 1]) in stopword_list or\
-                                    (temp_token_count == 3) or (temp_upos_count < 2) or (temp_verb_count > 1):
+                                    (temp_token_count == 3) or (temp_upos_count < 2) or (temp_verb_count > 1) or (temp_verb_count == 0):
                                 continue
                             else:
                                 ''' debugging code '''
