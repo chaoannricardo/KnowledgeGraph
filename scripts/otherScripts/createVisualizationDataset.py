@@ -7,8 +7,8 @@ if __name__ == '__main__':
     ''' Configurations '''
     ''' World Chronology Mandarin config '''
     # small dataset
-    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
-    DATA_EXPORT_PATH = "../../visualization/example_WorldChronology/datasets/WorldChronology.json"
+    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
+    # DATA_EXPORT_PATH = "../../visualization/example_WorldChronology/datasets/WorldChronology.json"
 
     # large dataset
     # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
@@ -16,12 +16,12 @@ if __name__ == '__main__':
 
     ''' Semiconductor config '''
     # small dataset
-    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
-    # DATA_EXPORT_PATH = "../../visualization/example_Semiconductor/datasets/WorldChronology.json"
+    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
+    DATA_EXPORT_PATH = "../../visualization/example_Semiconductor/datasets/Semiconductor.json"
 
     # large dataset
     # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
-    # DATA_EXPORT_PATH = "../../visualization/example_SemiconductorAll/datasets/WorldChronologyAll.json"
+    # DATA_EXPORT_PATH = "../../visualization/example_SemiconductorAll/datasets/SemiconductorAll.json"
 
     ''' Process Starts '''
     relation_triple_list = []
