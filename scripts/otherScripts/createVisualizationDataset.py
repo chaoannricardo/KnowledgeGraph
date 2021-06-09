@@ -5,9 +5,9 @@ import os
 
 if __name__ == '__main__':
     ''' Configurations '''
-    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    DATA_EXPORT_PATH = "../../visualization/example _WorldChronology/datasets/WorldChronology.json"
-    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
+    DATA_EXPORT_PATH = "../../visualization/example_WorldChronology/datasets/WorldChronology.json"
+    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
     # DATA_EXPORT_PATH = "../../visualization/example_WorldChronologyAll/datasets/WorldChronologyAll.json"
 
     ''' Process Starts '''
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # summarize with counts of each entity
     for line in data_import.readlines():
-        relation_triple = line.split("|")[1].split("@")
+        relation_triple = line.split("@")
         relation_triple_list.append(relation_triple)
 
         # adding count of occurence of entity
