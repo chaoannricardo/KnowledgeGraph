@@ -5,10 +5,10 @@ import os
 
 if __name__ == '__main__':
     ''' Configurations '''
-    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    # DATA_EXPORT_PATH = "../../visualization/example _WorldChronology/datasets/WorldChronology.json"
-    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
-    DATA_EXPORT_PATH = "../../visualization/example_WorldChronologyAll/datasets/WorldChronologyAll.json"
+    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+    DATA_EXPORT_PATH = "../../visualization/example _WorldChronology/datasets/WorldChronology.json"
+    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    # DATA_EXPORT_PATH = "../../visualization/example_WorldChronologyAll/datasets/WorldChronologyAll.json"
 
     ''' Process Starts '''
     relation_triple_list = []
