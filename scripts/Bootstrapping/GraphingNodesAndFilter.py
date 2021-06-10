@@ -46,22 +46,22 @@ if __name__ == '__main__':
 
     ''' Semiconductor config '''
     # small dataset
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
-    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
-    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_ENTITY.csv"
-    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_RELATION.csv"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
+    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
+    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_ENTITY.csv"
+    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_RELATION.csv"
+    # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
+    # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    # RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
+
+    # large dataset
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
+    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
+    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_ENTITY.csv"
+    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_RELATION.csv"
     EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
     OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
     RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
-
-    # large dataset
-    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
-    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
-    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_ENTITY.csv"
-    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_RELATION.csv"
-    # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
-    # OBJECT_DICT_PATH = "../dicts/SemiconductorAll/EntityDict/"
-    # RELATION_DICT_PATH = "../dicts/SemiconductorAll/RelationDict/"
 
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
     RELATIONS_TO_PLOT = 40  # "ALL"

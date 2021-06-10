@@ -16,12 +16,12 @@ if __name__ == '__main__':
 
     ''' Semiconductor config '''
     # small dataset
-    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
-    DATA_EXPORT_PATH = "../../visualization/example_Semiconductor/datasets/Semiconductor.json"
+    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
+    # DATA_EXPORT_PATH = "../../visualization/example_Semiconductor/datasets/Semiconductor.json"
 
     # large dataset
-    # RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
-    # DATA_EXPORT_PATH = "../../visualization/example_SemiconductorAll/datasets/SemiconductorAll.json"
+    RelationTriplePath = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
+    DATA_EXPORT_PATH = "../../visualization/example_SemiconductorAll/datasets/SemiconductorAll.json"
 
     ''' Process Starts '''
     relation_triple_list = []
