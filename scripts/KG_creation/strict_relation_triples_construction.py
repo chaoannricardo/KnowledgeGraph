@@ -36,23 +36,23 @@ if __name__ == '__main__':
     # RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
 
     # large dataset
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
-    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
-    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_ENTITY.csv"
-    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_RELATION.csv"
-    EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
-    OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
-    RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/STRICT_SEED_RELATION_WHOLE.csv"
+    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_ENTITY.csv"
+    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/NEW_RELATION.csv"
+    # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
+    # OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
+    # RELATION_DICT_PATH = "../dicts/WorldChronolgy/RelationDict/"
 
     ''' Semiconductor config '''
     # small dataset
-    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
-    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
-    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_ENTITY.csv"
-    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_RELATION.csv"
-    # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
-    # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
-    # RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
+    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
+    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_ENTITY.csv"
+    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_RELATION.csv"
+    EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
+    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
 
     # large dataset
     # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
@@ -65,6 +65,7 @@ if __name__ == '__main__':
 
     # other configurations
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
+    SHOW_GRAPH = False
     RELATIONS_TO_PLOT = 40  # "ALL"
     RECOGNIZED_EXISTING_WORD_FREQUENCY = 10
     RECONNECT_SECONDS = 1200
@@ -91,6 +92,11 @@ if __name__ == '__main__':
     # variables to construct graph
     graph_trigger_word_dict = {}
     graph_entity_word_list = []
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0",
+        "Accept-Encoding": "*",
+        "Connection": "keep-alive"
+    }
 
     # create object list
     for fileIndex, fileElement in enumerate(os.listdir(OBJECT_DICT_PATH)):
@@ -153,7 +159,7 @@ if __name__ == '__main__':
                             while True:
                                 r = requests.get(
                                     "http://shuyantech.com/api/cnprobase/ment2ent?q=" + query_word_simplified,
-                                    verify=False)
+                                    headers=headers)
                                 result_json = r.json()
                                 if result_json["status"] == "ok":
                                     cn_probase_dict[relationElement] = result_json["ret"]
@@ -229,32 +235,34 @@ if __name__ == '__main__':
         data_relation.write(relation + "\n")
 
     ''' Construct Graph Phase '''
-    if RELATIONS_TO_PLOT != "ALL":
-        G.add_edges_from(graph_entity_word_list[:RELATIONS_TO_PLOT])
-        # pos = nx.spring_layout(G)
-        # pos = nx.planar_layout(G)
-        pos = nx.circular_layout(G)
-        # pos = nx.shell_layout(G)
-        # pos = nx.kamada_kawai_layout(G)
-        nx.draw_networkx(G, pos, node_size=1000, node_color="y")
+    if SHOW_GRAPH:
+        if RELATIONS_TO_PLOT != "ALL":
+            G.add_edges_from(graph_entity_word_list[:RELATIONS_TO_PLOT])
+            # pos = nx.spring_layout(G)
+            # pos = nx.planar_layout(G)
+            pos = nx.circular_layout(G)
+            # pos = nx.shell_layout(G)
+            # pos = nx.kamada_kawai_layout(G)
+            nx.draw_networkx(G, pos, node_size=1000, node_color="y")
 
-        sub_graph_trigger_word_dict = {}
-        for tempIndex, tempElement in enumerate(graph_entity_word_list[:RELATIONS_TO_PLOT]):
-            sub_graph_trigger_word_dict[tempElement] = graph_trigger_word_dict[tempElement]
+            sub_graph_trigger_word_dict = {}
+            for tempIndex, tempElement in enumerate(graph_entity_word_list[:RELATIONS_TO_PLOT]):
+                sub_graph_trigger_word_dict[tempElement] = graph_trigger_word_dict[tempElement]
 
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=sub_graph_trigger_word_dict)
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=sub_graph_trigger_word_dict)
 
-    else:
-        G.add_edges_from(graph_entity_word_list)
-        # pos = nx.spring_layout(G)
-        # pos = nx.planar_layout(G)
-        pos = nx.circular_layout(G)
-        # pos = nx.shell_layout(G)
-        # pos = nx.kamada_kawai_layout(G)
-        nx.draw_networkx(G, pos, node_size=1000, node_color="y")
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=graph_trigger_word_dict)
+        else:
+            G.add_edges_from(graph_entity_word_list)
+            # pos = nx.spring_layout(G)
+            # pos = nx.planar_layout(G)
+            pos = nx.circular_layout(G)
+            # pos = nx.shell_layout(G)
+            # pos = nx.kamada_kawai_layout(G)
+            nx.draw_networkx(G, pos, node_size=1000, node_color="y")
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=graph_trigger_word_dict)
 
-    print("Available Entities:", entity_list, len(entity_list), "\nAvailable Relations:",
-          relation_list, len(relation_list))
+        print("Available Entities:", entity_list, len(entity_list), "\nAvailable Relations:",
+              relation_list, len(relation_list))
 
-    plt.show()
+        plt.show()
+

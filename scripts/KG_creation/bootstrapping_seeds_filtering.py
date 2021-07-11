@@ -26,6 +26,8 @@ if __name__ == '__main__':
         original_pattern = original_pattern.replace(relation.replace("\n", ""), "Predicate")
         seed_pattern_list.append(original_pattern)
 
+    # initiate object to prevent warning
+    data_filter = None
     for iteration in range(starting_filter, FILTER_COUNT_CRITEREA):
         # calculate and filter out import seeds
         data_calculate = pd.DataFrame({

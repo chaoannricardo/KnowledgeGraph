@@ -49,18 +49,18 @@ if __name__ == '__main__':
     TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
 
     # small dataset
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_TRIGGER_WORD.csv"
+    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
+    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION.csv"
+    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_BASIC.csv"
+    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
+    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_TRIGGER_WORD.csv"
 
     # large dataset
-    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_textAll/"  # data used to find new relations
-    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION.csv"
-    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_BASIC.csv"
-    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
-    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_TRIGGER_WORD.csv"
+    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_textAll/"  # data used to find new relations
+    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION.csv"
+    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_BASIC.csv"
+    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
+    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_TRIGGER_WORD.csv"
 
 
     config = {
