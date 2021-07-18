@@ -46,22 +46,22 @@ if __name__ == '__main__':
 
     ''' Semiconductor config '''
     # small dataset
-    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
-    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
-    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_ENTITY.csv"
-    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_RELATION.csv"
-    EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
-    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
-    RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
-
-    # large dataset
-    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
-    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
-    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_ENTITY.csv"
-    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_RELATION.csv"
+    # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
+    # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/STRICT_SEED_RELATION_WHOLE.csv"
+    # OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_ENTITY.csv"
+    # OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/NEW_RELATION.csv"
     # EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
     # OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
     # RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
+
+    # large dataset
+    LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
+    OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/STRICT_SEED_RELATION_WHOLE.csv"
+    OUTPUT_ENTITY = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_ENTITY.csv"
+    OUTPUT_RELATION = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/NEW_RELATION.csv"
+    EXTERNAL_KG_SAVING_PATH = "../dicts/External_KG/CN_Probase.txt"
+    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
+    RELATION_DICT_PATH = "../dicts/Semiconductor/RelationDict/"
 
     # other configurations
     NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
@@ -153,29 +153,38 @@ if __name__ == '__main__':
                     ''' query to check if inside CN-Probase '''
                     # query unseen word in first iteration
                     if iteration == 1:
+                        request_retry_count = 0
                         if relationElement not in cn_probase_dict.keys():
                             query_word_simplified = convert(relationElement, 'zh-hans')
                             retry_count = 0
                             while True:
-                                r = requests.get(
-                                    "http://shuyantech.com/api/cnprobase/ment2ent?q=" + query_word_simplified,
-                                    headers=headers)
-                                result_json = r.json()
-                                if result_json["status"] == "ok":
-                                    cn_probase_dict[relationElement] = result_json["ret"]
-                                    # add new query result into CN_Probase query result file
-                                    data_external_KG.write(str(relationElement) + "@" + str(result_json["ret"]) + "\n")
-                                    retry_count = 0
-                                    break
-                                else:
-                                    # wait 10 seconds and reconnect when can not connect to CN-Probase
-                                    if retry_count >= 10:
-                                        print("Retry connection over 10 times, program terminated.")
-                                        sys.exit(0)
+                                try:
+                                    r = requests.get(
+                                        "http://shuyantech.com/api/cnprobase/ment2ent?q=" + query_word_simplified)
+
+                                    result_json = r.json()
+                                    if result_json["status"] == "ok":
+                                        cn_probase_dict[relationElement] = result_json["ret"]
+                                        # add new query result into CN_Probase query result file
+                                        data_external_KG.write(
+                                            str(relationElement) + "@" + str(result_json["ret"]) + "\n")
+                                        retry_count = 0
+                                        break
                                     else:
-                                        print("Could not connect to CN-Probase, reconnect again in " + str(RECONNECT_SECONDS) + " seconds.")
-                                        time.sleep(RECONNECT_SECONDS)
-                                        retry_count += 1
+                                        # wait 10 seconds and reconnect when can not connect to CN-Probase
+                                        if retry_count >= 10:
+                                            print("Retry connection over 10 times, program terminated.")
+                                            sys.exit(0)
+                                        else:
+                                            print("Could not connect to CN-Probase, reconnect again in " + str(
+                                                RECONNECT_SECONDS) + " seconds.")
+                                            time.sleep(RECONNECT_SECONDS)
+                                            retry_count += 1
+                                except requests.exceptions.ConnectionError:
+                                    request_retry_count += 1
+                                    print("Retrying connection in", (10 * request_retry_count), "seconds")
+                                    time.sleep(10 * request_retry_count)
+
                         else:
                             if len(cn_probase_dict[relationElement]) == 0:
                                 if relationElement not in new_word_candidate_count_dict.keys():

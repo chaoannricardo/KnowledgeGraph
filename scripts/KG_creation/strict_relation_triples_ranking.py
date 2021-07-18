@@ -13,15 +13,15 @@ if __name__ == '__main__':
     # DATA_TEXT_DIR_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\WorldChronologyMandarin"
     # OUTPUT_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\WorldChronology\\STRICT_SEED_RELATION_RANKING.csv"
     # large dataset
-    STRICT_RELATION_TRIPLES_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\WorldChronologyAll\\STRICT_SEED_RELATION_WHOLE.csv"
-    DATA_TEXT_DIR_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\WorldChronologyMandarinAll"
-    OUTPUT_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\WorldChronologyAll\\STRICT_SEED_RELATION_RANKING.csv"
+    # STRICT_RELATION_TRIPLES_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\WorldChronologyAll\\STRICT_SEED_RELATION_WHOLE.csv"
+    # DATA_TEXT_DIR_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\WorldChronologyMandarinAll"
+    # OUTPUT_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\WorldChronologyAll\\STRICT_SEED_RELATION_RANKING.csv"
 
     # Semiconductor
     # small dataset
-    # STRICT_RELATION_TRIPLES_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\Semiconductor\\STRICT_SEED_RELATION_WHOLE.csv"
-    # DATA_TEXT_DIR_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\data_normal_wafer_text"
-    # OUTPUT_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\Semiconductor\\STRICT_SEED_RELATION_RANKING.csv"
+    STRICT_RELATION_TRIPLES_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\Semiconductor\\STRICT_SEED_RELATION_WHOLE.csv"
+    DATA_TEXT_DIR_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\data_normal_wafer_text"
+    OUTPUT_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\Semiconductor\\STRICT_SEED_RELATION_RANKING.csv"
     # large dataset
     # STRICT_RELATION_TRIPLES_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\results_kg\\SemiconductorAll\\STRICT_SEED_RELATION_WHOLE.csv"
     # DATA_TEXT_DIR_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\data_normal_wafer_textAll"
