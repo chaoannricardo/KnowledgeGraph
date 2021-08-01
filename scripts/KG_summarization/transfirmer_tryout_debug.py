@@ -13,6 +13,7 @@ import time
 import torch
 import torch.nn as nn
 
+''' Data Source Configuration '''
 TRAIN_DATA_X_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\CLTS\\train.src"
 TRAIN_DATA_y_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\CLTS\\train.tgt"
 VALID_DATA_X_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\CLTS\\valid.src"
@@ -20,6 +21,17 @@ VALID_DATA_y_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials
 TEST_DATA_X_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\CLTS\\test.src"
 TEST_DATA_y_PATH = "C:\\Users\\User\\Desktop\\Ricardo\\KnowledgeGraph_materials\\data_kg\\CLTS\\test.tgt"
 
+''' Data Configuration '''
+TRAIN_SAMPLE_NUM = 10
+VALID_SAMPLE_NUM = 200
+TEST_SAMPLE_NUM = 100
+WORD_MIN_FREQUENCY = 0
+# MAX_LENGTH_INPUT = int(np.max([len(data)+2 for data in train_x_list]))
+# MAX_LENGTH_OUTPUT = int(np.max([len(data)+2 for data in train_y_list]))
+MAX_LENGTH_INPUT = 10
+MAX_LENGTH_OUTPUT = 10
+
+''' Random Seeds '''
 SEED = 100
 random.seed(SEED)
 np.random.seed(SEED)
@@ -27,116 +39,39 @@ torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 
+''' Model Configurations '''
+# activate gpu or cpu
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = "cpu"
+BATCH_SIZE = 1
+D_MODEL = 256
+ENC_LAYERS = 3
+DEC_LAYERS = 3
+ENC_HEADS = 8
+DEC_HEADS = 8
+ENC_PF_DIM = 512
+DEC_PF_DIM = 512
+ENC_DROPOUT = 0.1
+DEC_DROPOUT = 0.1
+N_EPOCHS = 15
+CLIP = 1
+LEARNING_RATE = 0.001
 
-train_x_list = []
-train_y_list = []
-valid_x_list = []
-valid_y_list = []
-test_x_list = []
-test_y_list = []
-
-file_train_x = codecs.open(TRAIN_DATA_X_PATH, mode="r", encoding="utf8")
-file_train_y = codecs.open(TRAIN_DATA_y_PATH, mode="r", encoding="utf8")
-file_valid_x = codecs.open(VALID_DATA_X_PATH, mode="r", encoding="utf8")
-file_valid_y = codecs.open(VALID_DATA_y_PATH, mode="r", encoding="utf8")
-file_test_x = codecs.open(TEST_DATA_X_PATH, mode="r", encoding="utf8")
-file_test_y = codecs.open(TEST_DATA_y_PATH, mode="r", encoding="utf8")
-
-
-TRAIN_SAMPLE_NUM = 500
-VALID_SAMPLE_NUM = 200
-TEST_SAMPLE_NUM = 100
-
-# create list for training, validation, testing set
-temp_index = 0
-while True:
-    line = file_train_x.readline()
-    train_x_list.append(line.replace(" ", "").replace("\n", ""))
-
-    if not line or temp_index == TRAIN_SAMPLE_NUM:
-        temp_index = 0
-        break
-    else:
-        temp_index += 1
-
-while True or temp_index == TRAIN_SAMPLE_NUM:
-    line = file_train_y.readline()
-    train_y_list.append(line.replace(" ", "").replace("\n", ""))
-
-    if not line or temp_index == TRAIN_SAMPLE_NUM:
-        temp_index = 0
-        break
-    else:
-        temp_index += 1
-
-while True or temp_index == VALID_SAMPLE_NUM:
-    line = file_valid_x.readline()
-    valid_x_list.append(line.replace(" ", "").replace("\n", ""))
-
-    if not line or temp_index == VALID_SAMPLE_NUM:
-        temp_index = 0
-        break
-    else:
-        temp_index += 1
-
-while True or temp_index == VALID_SAMPLE_NUM:
-    line = file_valid_y.readline()
-    valid_y_list.append(line.replace(" ", "").replace("\n", ""))
-
-    if not line or temp_index == VALID_SAMPLE_NUM:
-        temp_index = 0
-        break
-    else:
-        temp_index += 1
-
-while True or temp_index == TEST_SAMPLE_NUM:
-    line = file_test_x.readline()
-    test_x_list.append(line.replace(" ", "").replace("\n", ""))
-
-    if not line or temp_index == TEST_SAMPLE_NUM:
-        temp_index = 0
-        break
-    else:
-        temp_index += 1
-
-while True:
-    line = file_test_y.readline()
-    test_y_list.append(line.replace(" ", "").replace("\n", ""))
-
-    if not line or temp_index == TEST_SAMPLE_NUM:
-        temp_index = 0
-        break
-    else:
-        temp_index += 1
-
-print(len(train_x_list), len(train_y_list), len(valid_x_list), len(valid_y_list), len(test_x_list), len(test_y_list))
-print(train_x_list[10], "\n\n", train_y_list[10])
+''' Functions and Model classes '''
 
 
-# define tokenization function
+# tokenization function
 def tokenize(text):
     return [char for char in text]
 
-SRC = Field(tokenize = tokenize,
-            init_token = '<bos>',
-            eos_token = '<eos>',
-            lower = True,
-            batch_first = True)
-
-TRG = Field(tokenize = tokenize,
-            init_token = '<bos>',
-            eos_token = '<eos>',
-            lower = True,
-            batch_first = True)
 
 # building customize dataset
 # reference: https://www.programmersought.com/article/7283735573/
-
 # get_dataset constructs and returns the examples and fields required by the Dataset
 def get_dataset(input_data, output_data, input_data_field, output_data_field, test=False):
-	# idData pair training is useless during training, use None to specify its corresponding field
-    fields = [("id", None), # we won't be needing the id, so we pass in None as the field
-                 ("src", input_data_field), ("trg", output_data_field)]
+    # idData pair training is useless during training, use None to specify its corresponding field
+    fields = [("id", None),  # we won't be needing the id, so we pass in None as the field
+              ("src", input_data_field), ("trg", output_data_field)]
     examples = []
 
     if test:
@@ -147,35 +82,6 @@ def get_dataset(input_data, output_data, input_data_field, output_data_field, te
         for text, label in tqdm(zip(input_data, output_data)):
             examples.append(data.Example.fromlist([None, text, label], fields))
     return examples, fields
-
-# Get the examples and fields needed to build the Dataset
-train_examples, train_fields = get_dataset(train_x_list, train_y_list, SRC, TRG)
-valid_examples, valid_fields = get_dataset(valid_x_list, valid_y_list, SRC, TRG)
-test_examples, test_fields = get_dataset(test_x_list, test_y_list, SRC, None, test=True)
-
-#Build Dataset dataset
-train_data = data.Dataset(train_examples, train_fields)
-valid_data = data.Dataset(valid_examples, valid_fields)
-test_data = data.Dataset(test_examples, test_fields)
-
-SRC.build_vocab(train_data, min_freq = 2)
-TRG.build_vocab(train_data, min_freq = 2)
-
-print(f"Unique tokens in source (de) vocabulary: {len(SRC.vocab)}")
-print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
-
-# activate gpu
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device
-
-device = "cpu"
-
-BATCH_SIZE = 1
-
-# Use BucketIterator instead of the usual one to automatically deal with padding problem
-train_iterator, valid_iterator, test_iterator = BucketIterator.splits((train_data, valid_data, test_data),
-                                                                      batch_size=BATCH_SIZE,
-                                                                      device=device)
 
 
 class Encoder(nn.Module):
@@ -224,7 +130,6 @@ class Encoder(nn.Module):
 
 
 # Encoder Layer used inside Encoder module
-
 class EncoderLayer(nn.Module):
     def __init__(self, d_model, n_heads, pf_dim, dropout):
         super().__init__()
@@ -548,35 +453,6 @@ class Transformer(nn.Module):
         return output, attention_weights
 
 
-INPUT_DIM = len(SRC.vocab)
-OUTPUT_DIM = len(TRG.vocab)
-D_MODEL = 256
-ENC_LAYERS = 3
-DEC_LAYERS = 3
-ENC_HEADS = 8
-DEC_HEADS = 8
-ENC_PF_DIM = 512
-DEC_PF_DIM = 512
-ENC_DROPOUT = 0.1
-DEC_DROPOUT = 0.1
-N_EPOCHS = 15
-CLIP = 1
-# MAX_LENGTH_INPUT = int(np.max([len(data)+2 for data in train_x_list]))
-# MAX_LENGTH_OUTPUT = int(np.max([len(data)+2 for data in train_y_list]))
-MAX_LENGTH_INPUT = 10
-MAX_LENGTH_OUTPUT = 10
-LEARNING_RATE = 0.001
-
-# 建立 encoder 和 decoder class
-enc = Encoder(INPUT_DIM, D_MODEL, ENC_LAYERS, ENC_HEADS, ENC_PF_DIM, ENC_DROPOUT, MAX_LENGTH_INPUT)
-dec = Decoder(OUTPUT_DIM, D_MODEL, DEC_LAYERS, DEC_HEADS, DEC_PF_DIM, DEC_DROPOUT, MAX_LENGTH_OUTPUT)
-
-SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
-TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]  # PAD_IDX=1
-
-model = Transformer(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX).to(device)
-
-
 # Model summary
 def init_weights(m):
     for name, param in m.named_parameters():
@@ -588,10 +464,6 @@ def init_weights(m):
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
-# print(model.apply(init_weights))
-print(f'The model has {count_parameters(model):,} trainable parameters')
 
 
 class ScheduledOptim():
@@ -628,11 +500,6 @@ class ScheduledOptim():
 
         for param_group in self._optimizer.param_groups:
             param_group['lr'] = lr
-
-
-optimizer = ScheduledOptim(torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, betas=(0.9, 0.98), eps=1e-09),
-                           d_model=D_MODEL, n_warmup_steps=4000)
-criterion = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX)
 
 
 def train_epoch(model, iterator, optimizer, criterion, clip):
@@ -749,4 +616,140 @@ def train(model, train_iterator, valid_iterator, optimizer, criterion):
     showPlot(plot_tr_loss, plot_va_loss)
 
 
-train(model, train_iterator, valid_iterator, optimizer, criterion)
+if __name__ == '__main__':
+
+    ''' Process Begins '''
+    train_x_list = []
+    train_y_list = []
+    valid_x_list = []
+    valid_y_list = []
+    test_x_list = []
+    test_y_list = []
+
+    file_train_x = codecs.open(TRAIN_DATA_X_PATH, mode="r", encoding="utf8")
+    file_train_y = codecs.open(TRAIN_DATA_y_PATH, mode="r", encoding="utf8")
+    file_valid_x = codecs.open(VALID_DATA_X_PATH, mode="r", encoding="utf8")
+    file_valid_y = codecs.open(VALID_DATA_y_PATH, mode="r", encoding="utf8")
+    file_test_x = codecs.open(TEST_DATA_X_PATH, mode="r", encoding="utf8")
+    file_test_y = codecs.open(TEST_DATA_y_PATH, mode="r", encoding="utf8")
+
+    # create list for training, validation, testing set
+    temp_index = 0
+    while True:
+        line = file_train_x.readline()
+        train_x_list.append(line.replace(" ", "").replace("\n", ""))
+
+        if not line or temp_index == TRAIN_SAMPLE_NUM:
+            temp_index = 0
+            break
+        else:
+            temp_index += 1
+
+    while True or temp_index == TRAIN_SAMPLE_NUM:
+        line = file_train_y.readline()
+        train_y_list.append(line.replace(" ", "").replace("\n", ""))
+
+        if not line or temp_index == TRAIN_SAMPLE_NUM:
+            temp_index = 0
+            break
+        else:
+            temp_index += 1
+
+    while True or temp_index == VALID_SAMPLE_NUM:
+        line = file_valid_x.readline()
+        valid_x_list.append(line.replace(" ", "").replace("\n", ""))
+
+        if not line or temp_index == VALID_SAMPLE_NUM:
+            temp_index = 0
+            break
+        else:
+            temp_index += 1
+
+    while True or temp_index == VALID_SAMPLE_NUM:
+        line = file_valid_y.readline()
+        valid_y_list.append(line.replace(" ", "").replace("\n", ""))
+
+        if not line or temp_index == VALID_SAMPLE_NUM:
+            temp_index = 0
+            break
+        else:
+            temp_index += 1
+
+    while True or temp_index == TEST_SAMPLE_NUM:
+        line = file_test_x.readline()
+        test_x_list.append(line.replace(" ", "").replace("\n", ""))
+
+        if not line or temp_index == TEST_SAMPLE_NUM:
+            temp_index = 0
+            break
+        else:
+            temp_index += 1
+
+    while True:
+        line = file_test_y.readline()
+        test_y_list.append(line.replace(" ", "").replace("\n", ""))
+
+        if not line or temp_index == TEST_SAMPLE_NUM:
+            temp_index = 0
+            break
+        else:
+            temp_index += 1
+
+    print(len(train_x_list), len(train_y_list), len(valid_x_list), len(valid_y_list), len(test_x_list),
+          len(test_y_list))
+    print(train_x_list[10], "\n\n", train_y_list[10])
+
+    SRC = Field(tokenize=tokenize,
+                init_token='<bos>',
+                eos_token='<eos>',
+                lower=True,
+                batch_first=True)
+
+    TRG = Field(tokenize=tokenize,
+                init_token='<bos>',
+                eos_token='<eos>',
+                lower=True,
+                batch_first=True)
+
+    # Get the examples and fields needed to build the Dataset
+    train_examples, train_fields = get_dataset(train_x_list, train_y_list, SRC, TRG)
+    valid_examples, valid_fields = get_dataset(valid_x_list, valid_y_list, SRC, TRG)
+    test_examples, test_fields = get_dataset(test_x_list, test_y_list, SRC, None, test=True)
+
+    # Build Dataset dataset
+    train_data = data.Dataset(train_examples, train_fields)
+    valid_data = data.Dataset(valid_examples, valid_fields)
+    test_data = data.Dataset(test_examples, test_fields)
+
+    SRC.build_vocab(train_data, min_freq=WORD_MIN_FREQUENCY)
+    TRG.build_vocab(train_data, min_freq=WORD_MIN_FREQUENCY)
+
+    # difine input dim and output dim of model
+    INPUT_DIM = len(SRC.vocab)
+    OUTPUT_DIM = len(TRG.vocab)
+
+    print(f"Unique tokens in source (de) vocabulary: {len(SRC.vocab)}")
+    print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
+
+    # Use BucketIterator instead of the usual one to automatically deal with padding problem
+    train_iterator, valid_iterator, test_iterator = BucketIterator.splits((train_data, valid_data, test_data),
+                                                                          batch_size=BATCH_SIZE,
+                                                                          device=device)
+
+    # 建立 encoder 和 decoder class
+    enc = Encoder(INPUT_DIM, D_MODEL, ENC_LAYERS, ENC_HEADS, ENC_PF_DIM, ENC_DROPOUT, MAX_LENGTH_INPUT)
+    dec = Decoder(OUTPUT_DIM, D_MODEL, DEC_LAYERS, DEC_HEADS, DEC_PF_DIM, DEC_DROPOUT, MAX_LENGTH_OUTPUT)
+
+    SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
+    TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]  # PAD_IDX=1
+
+    model = Transformer(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX).to(device)
+
+    # print(model.apply(init_weights))
+    print(f'The model has {count_parameters(model):,} trainable parameters')
+
+    optimizer = ScheduledOptim(torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, betas=(0.9, 0.98), eps=1e-09),
+                               d_model=D_MODEL, n_warmup_steps=4000)
+    criterion = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX)
+
+    train(model, train_iterator, valid_iterator, optimizer, criterion)
