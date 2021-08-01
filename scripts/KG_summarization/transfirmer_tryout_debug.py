@@ -30,6 +30,8 @@ WORD_MIN_FREQUENCY = 0
 # MAX_LENGTH_OUTPUT = int(np.max([len(data)+2 for data in train_y_list]))
 MAX_LENGTH_INPUT = 10
 MAX_LENGTH_OUTPUT = 10
+BOS_TOKEN = "<BOS>"
+EOS_TOKEN = "<EOS>"
 
 ''' Random Seeds '''
 SEED = 100
@@ -62,7 +64,7 @@ LEARNING_RATE = 0.001
 
 # tokenization function
 def tokenize(text):
-    return [char for char in text]
+    return [char for char in text.split(" ")]
 
 
 # building customize dataset
@@ -80,6 +82,8 @@ def get_dataset(input_data, output_data, input_data_field, output_data_field, te
             examples.append(data.Example.fromlist([None, text, None], fields))
     else:
         for text, label in tqdm(zip(input_data, output_data)):
+            # print(text)
+            # print(label)
             examples.append(data.Example.fromlist([None, text, label], fields))
     return examples, fields
 
@@ -635,9 +639,9 @@ if __name__ == '__main__':
 
     # create list for training, validation, testing set
     temp_index = 0
-    while True:
+    while True or temp_index == TRAIN_SAMPLE_NUM:
         line = file_train_x.readline()
-        train_x_list.append(line.replace(" ", "").replace("\n", ""))
+        train_x_list.append(BOS_TOKEN + " " + line.replace("\n", "") + " " + EOS_TOKEN)
 
         if not line or temp_index == TRAIN_SAMPLE_NUM:
             temp_index = 0
@@ -647,7 +651,7 @@ if __name__ == '__main__':
 
     while True or temp_index == TRAIN_SAMPLE_NUM:
         line = file_train_y.readline()
-        train_y_list.append(line.replace(" ", "").replace("\n", ""))
+        train_y_list.append(BOS_TOKEN + " " + line.replace("\n", "") + " " + EOS_TOKEN)
 
         if not line or temp_index == TRAIN_SAMPLE_NUM:
             temp_index = 0
@@ -657,7 +661,7 @@ if __name__ == '__main__':
 
     while True or temp_index == VALID_SAMPLE_NUM:
         line = file_valid_x.readline()
-        valid_x_list.append(line.replace(" ", "").replace("\n", ""))
+        valid_x_list.append(BOS_TOKEN + " " + line.replace("\n", "") + " " + EOS_TOKEN)
 
         if not line or temp_index == VALID_SAMPLE_NUM:
             temp_index = 0
@@ -667,7 +671,7 @@ if __name__ == '__main__':
 
     while True or temp_index == VALID_SAMPLE_NUM:
         line = file_valid_y.readline()
-        valid_y_list.append(line.replace(" ", "").replace("\n", ""))
+        valid_y_list.append(BOS_TOKEN + " " + line.replace("\n", "") + " " + EOS_TOKEN)
 
         if not line or temp_index == VALID_SAMPLE_NUM:
             temp_index = 0
@@ -677,7 +681,7 @@ if __name__ == '__main__':
 
     while True or temp_index == TEST_SAMPLE_NUM:
         line = file_test_x.readline()
-        test_x_list.append(line.replace(" ", "").replace("\n", ""))
+        test_x_list.append(BOS_TOKEN + " " + line.replace("\n", "") + " " + EOS_TOKEN)
 
         if not line or temp_index == TEST_SAMPLE_NUM:
             temp_index = 0
@@ -685,9 +689,9 @@ if __name__ == '__main__':
         else:
             temp_index += 1
 
-    while True:
+    while True or temp_index == TEST_SAMPLE_NUM:
         line = file_test_y.readline()
-        test_y_list.append(line.replace(" ", "").replace("\n", ""))
+        test_y_list.append(BOS_TOKEN + " " + line.replace("\n", "") + " " + EOS_TOKEN)
 
         if not line or temp_index == TEST_SAMPLE_NUM:
             temp_index = 0
@@ -700,15 +704,15 @@ if __name__ == '__main__':
     print(train_x_list[10], "\n\n", train_y_list[10])
 
     SRC = Field(tokenize=tokenize,
-                init_token='<bos>',
-                eos_token='<eos>',
-                lower=True,
+                init_token=BOS_TOKEN,
+                eos_token=EOS_TOKEN,
+                lower=False,
                 batch_first=True)
 
     TRG = Field(tokenize=tokenize,
-                init_token='<bos>',
-                eos_token='<eos>',
-                lower=True,
+                init_token=BOS_TOKEN,
+                eos_token=EOS_TOKEN,
+                lower=False,
                 batch_first=True)
 
     # Get the examples and fields needed to build the Dataset
