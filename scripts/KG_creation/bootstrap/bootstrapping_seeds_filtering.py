@@ -6,11 +6,13 @@ import pandas as pd
 
 if __name__ == '__main__':
     ''' Configurations '''
-    SEED_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"
-    FILTER_SEED_EXPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"
+    MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
+    SEED_IMPORT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
+    FILTER_SEED_EXPORT_PATH =  MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"
     FILTER_COUNT_CRITEREA = 14
     IF_SHOW_ESTIMATE_CURVE = True
     STARTING_FILTER = 5
+
     ''' Process Starts '''
     seed_pattern_list = []
 

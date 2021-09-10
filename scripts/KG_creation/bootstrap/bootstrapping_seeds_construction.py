@@ -10,27 +10,29 @@ from tqdm import tqdm
 import codecs
 import networkx as nx
 import pandas as pd
-import re
 import stanza
 
 if __name__ == '__main__':
     ''' Configurations '''
-    SEED_RELATION_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
-    SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION.csv"
-    BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC.csv"
-    WHOLE_RESULT_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_WHOLE.csv"
-    TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
+    MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
+    SEED_RELATION_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
+    SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations.csv"
+    BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
+    WHOLE_RESULT_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_whole.csv"
+    TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
+
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
         'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
-        'tokenize_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/tokenize/gsd.pt',
+        'tokenize_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/tokenize/gsd.pt',
         # Processor-specific arguments are set with keys "{processor_name}_{argument_name}"
-        'pos_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pos/gsd.pt',
-        'pos_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
-        'lemma_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/lemma/gsd.pt',
-        'depparse_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/depparse/gsd.pt',
-        'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
+        'pos_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/pos/gsd.pt',
+        'pos_pretrain_path': MATERIALS_DIR + 'stanza_resources/zh-hant/pretrain/gsd.pt',
+        'lemma_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/lemma/gsd.pt',
+        'depparse_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/depparse/gsd.pt',
+        'depparse_pretrain_path': MATERIALS_DIR + 'stanza_resources/zh-hant/pretrain/gsd.pt',
     }
+
     ''' Process Starts '''
     file_import = codecs.open(SEED_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
     file_export = codecs.open(SEED_OUTPUT_PATH, mode="w", encoding="utf8")
@@ -44,13 +46,6 @@ if __name__ == '__main__':
     for lineIndex, line in enumerate(tqdm(file_import.readlines())):
         if lineIndex == 0:
             continue
-
-    # testing usage
-    # for debugging
-    # if lineIndex == 100:
-    #     break
-    # for i in range(1):
-    #     line = "電影裡讓我直接想起來的還有吳宇森導演的，辣手神探，的殮房的祕門啊●吳宇森●導演●辣手神探"
 
         text = line.split("●")[0]
         object_name = line.split("●")[1]
@@ -189,11 +184,3 @@ if __name__ == '__main__':
     file_export_basic_lines = list(set(file_export_basic.readlines()))
     file_export_basic = codecs.open(BASIC_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     file_export_basic.writelines(file_export_basic_lines)
-
-
-
-
-
-
-
-
