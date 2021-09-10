@@ -12,20 +12,65 @@ OUTPUT_DIR = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_GBN/"
 PATTERN_TYPE = 0
 
 if __name__ == '__main__':
+    # open files to write
     file_output_entities = codecs.open(OUTPUT_DIR + "entities.txt", mode="w", encoding="utf8")
+    file_output_entities_labels = codecs.open(OUTPUT_DIR + "entity_labels.txt", mode="w", encoding="utf8")
+    file_output_labels = codecs.open(OUTPUT_DIR + "labels.txt", mode="w", encoding="utf8")
+    file_output_links = codecs.open(OUTPUT_DIR + "links.txt", mode="w", encoding="utf8")
+    file_output_pattern_label_vocab = codecs.open(OUTPUT_DIR + "pattern_label_vocab.txt", mode="w", encoding="utf8")
+    file_output_pattern_label = codecs.open(OUTPUT_DIR + "pattern_labels.txt", mode="w", encoding="utf8")
     file_output_pattern = codecs.open(OUTPUT_DIR + "patterns.txt", mode="w", encoding="utf8")
 
+    # initiate list to store data
+    nodes = []
+    patterns = []
 
-    if PATTERN_TYPE == 0:
-        # create dependency pattern
-        file_seed = codecs.open(SEED_DIR + "seed_relations_basic.csv", encoding="utf8", mode="r", errors="ignore")
+    # read in seed file
+    file_seed = codecs.open(SEED_DIR + "seed_relations_basic.csv", encoding="utf8", mode="r", errors="ignore")
 
-        for lineIndex, line in enumerate(file_seed.readlines()):
-            edge = line.split("&")[1]
-            dependency_path = line.split("&")[0].replace("@", "&")
+    for lineIndex, line in enumerate(file_seed.readlines()):
+        dependency_path = line.split("&")[0].replace("@", "&")
+        entity_1 = line.split("&")[0].split("@")[0]
+        entity_2 = line.split("&")[0].split("@")[-1]
+        edge = line.split("&")[1]
+
+        # store nodes
+        for entity in [entity_1, entity_2, edge]:
+            if entity not in nodes:
+                nodes.append(entity)
+
+        if PATTERN_TYPE == 0:
+            # store patterns
+            if dependency_path not in patterns:
+                patterns.append(dependency_path)
+
+            # write links
+            file_output_links.write("\t".join([str(nodes.index(entity_1)), str(patterns.index(dependency_path)), "1"]) + "\n")
+            file_output_links.write("\t".join([str(nodes.index(entity_2)), str(patterns.index(dependency_path)), "1"]) + "\n")
+            file_output_links.write("\t".join([str(nodes.index(edge)), str(patterns.index(dependency_path)), "1"]) + "\n")
+
+            pass
+        elif PATTERN_TYPE == 1:
+            pass
+
+    # write entities
+    for entity in nodes:
+        file_output_entities.write(str(entity) + "\n")
+        file_output_entities_labels.write("\t".join([str(entity), "0"]))
+
+    # write labels
+    file_output_labels.write("Entity")
+
+    # write patterns
+    file_output_pattern_label_vocab.write("0")
+
+    for patternIndex, pattern in enumerate(patterns):
+        file_output_pattern_label.write("\t".join([str(patternIndex), "0"]) + "\n")
+        file_output_pattern.write()
 
 
 
-        pass
-    elif PATTERN_TYPE == 1:
-        pass
+
+
+
+
