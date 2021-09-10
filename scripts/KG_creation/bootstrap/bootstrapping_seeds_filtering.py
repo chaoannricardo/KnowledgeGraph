@@ -3,17 +3,15 @@ import codecs
 import matplotlib.pyplot as plt
 import pandas as pd
 
+''' Configurations '''
+MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
+SEED_IMPORT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
+FILTER_SEED_EXPORT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"
+FILTER_COUNT_CRITEREA = 14
+IF_SHOW_ESTIMATE_CURVE = True
+STARTING_FILTER = 5
 
 if __name__ == '__main__':
-    ''' Configurations '''
-    MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
-    SEED_IMPORT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
-    FILTER_SEED_EXPORT_PATH =  MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"
-    FILTER_COUNT_CRITEREA = 14
-    IF_SHOW_ESTIMATE_CURVE = True
-    STARTING_FILTER = 5
-
-    ''' Process Starts '''
     seed_pattern_list = []
 
     seed_basic = codecs.open(SEED_IMPORT_PATH, mode="r", encoding="utf8", errors="ignore")

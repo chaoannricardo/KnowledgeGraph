@@ -12,15 +12,15 @@ import networkx as nx
 import pandas as pd
 import stanza
 
-if __name__ == '__main__':
-    ''' Configurations '''
-    MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
-    SEED_RELATION_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
-    SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations.csv"
-    BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
-    WHOLE_RESULT_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_whole.csv"
-    TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
+''' Configurations '''
+MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
+SEED_RELATION_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
+SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations.csv"
+BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
+WHOLE_RESULT_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_whole.csv"
+TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
 
+if __name__ == '__main__':
     config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
         'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
