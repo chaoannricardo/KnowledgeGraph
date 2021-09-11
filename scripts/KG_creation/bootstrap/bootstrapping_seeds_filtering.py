@@ -62,16 +62,19 @@ if __name__ == '__main__':
     # filter original seed and export
     print("Now filtering original seeds...")
     for lineIndex, line in enumerate(tqdm(seed.readlines())):
-        line = line.replace("\n", "")
-        edge = line.split("&")[1]
-        dependency_node_list = line.split("&")[0].split("@")
-        dependency_node_list[0] = "Entity"
-        dependency_node_list[-1] = "Entity"
-        dependency_node_list[dependency_node_list.index(edge)] = "Predicate"
-        basic_pattern = "@".join(dependency_node_list)
+        try:
+            line = line.replace("\n", "")
+            edge = line.split("&")[-1]
+            dependency_node_list = "&".join(line.split("&")[:-1]).split("@")
+            dependency_node_list[0] = "Entity"
+            dependency_node_list[-1] = "Entity"
+            dependency_node_list[dependency_node_list.index(edge)] = "Predicate"
+            basic_pattern = "@".join(dependency_node_list)
 
-        if basic_pattern in data_filter:
-            seed_filter_export.write(line + "\n")
+            if basic_pattern in data_filter:
+                seed_filter_export.write(line + "\n")
+        except ValueError:
+            continue
 
     # plotting filtering curve
     if IF_SHOW_ESTIMATE_CURVE:
