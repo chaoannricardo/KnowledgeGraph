@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
+from tqdm import tqdm
 import codecs
-import os
 
 ''' Configurations '''
 MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
@@ -26,13 +26,12 @@ if __name__ == '__main__':
     patterns = []
 
     # read in seed file
-    file_seed = codecs.open(SEED_DIR + "seed_relations_basic.csv", encoding="utf8", mode="r", errors="ignore")
+    file_seed = codecs.open(SEED_DIR + "seed_relations.csv", encoding="utf8", mode="r", errors="ignore")
 
-    for lineIndex, line in enumerate(file_seed.readlines()):
-        dependency_path = line.split("&")[0].replace("@", "&")
+    for lineIndex, line in enumerate(tqdm(file_seed.readlines())):
+        edge = line.split("&")[1]
         entity_1 = line.split("&")[0].split("@")[0]
         entity_2 = line.split("&")[0].split("@")[-1]
-        edge = line.split("&")[1]
 
         # store nodes
         for entity in [entity_1, entity_2, edge]:
@@ -40,23 +39,29 @@ if __name__ == '__main__':
                 nodes.append(entity)
 
         if PATTERN_TYPE == 0:
+            # create patterns
+            dependency_path_list = line.split("&")[0].split("@")
+            dependency_path_list[0] = "@Entity"
+            dependency_path_list[-1] = "@Entity"
+            dependency_path_list[dependency_path_list.index(edge)] = "@Predicate"
+            dependency_path = "&".join(dependency_path_list)
+
             # store patterns
             if dependency_path not in patterns:
                 patterns.append(dependency_path)
 
-            # write links
+            # write links: source target weight
             file_output_links.write("\t".join([str(nodes.index(entity_1)), str(patterns.index(dependency_path)), "1"]) + "\n")
             file_output_links.write("\t".join([str(nodes.index(entity_2)), str(patterns.index(dependency_path)), "1"]) + "\n")
             file_output_links.write("\t".join([str(nodes.index(edge)), str(patterns.index(dependency_path)), "1"]) + "\n")
 
-            pass
         elif PATTERN_TYPE == 1:
             pass
 
-    # write entities
+    # write entities & entity_label
     for entity in nodes:
         file_output_entities.write(str(entity) + "\n")
-        file_output_entities_labels.write("\t".join([str(entity), "0"]))
+        file_output_entities_labels.write("\t".join([str(entity), "0"]) + "\n")
 
     # write labels
     file_output_labels.write("Entity")
@@ -66,7 +71,7 @@ if __name__ == '__main__':
 
     for patternIndex, pattern in enumerate(patterns):
         file_output_pattern_label.write("\t".join([str(patternIndex), "0"]) + "\n")
-        file_output_pattern.write()
+        file_output_pattern.write(pattern + "\n")
 
 
 
