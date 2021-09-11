@@ -17,7 +17,6 @@ MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
 SEED_RELATION_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
 SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations.csv"
 BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
-WHOLE_RESULT_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_whole.csv"
 TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
 
 if __name__ == '__main__':
@@ -37,7 +36,6 @@ if __name__ == '__main__':
     file_import = codecs.open(SEED_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
     file_export = codecs.open(SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     file_export_basic = codecs.open(BASIC_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
-    file_export_whole = codecs.open(WHOLE_RESULT_OUTPUT_PATH, mode="w", encoding="utf8")
     file_trigger_word = codecs.open(TRIGGER_WORD_OUTPUT_PATH, mode="w", encoding="utf8")
     nlp = stanza.Pipeline(**config)
 
