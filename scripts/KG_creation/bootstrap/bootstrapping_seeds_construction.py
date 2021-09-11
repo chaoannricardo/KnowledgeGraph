@@ -13,11 +13,11 @@ import pandas as pd
 import stanza
 
 ''' Configurations '''
-MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
-SEED_RELATION_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/duie_train.csv"
-SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations.csv"
-BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
-TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
+MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/"
+SEED_RELATION_PATH = MATERIALS_DIR + "duie_train.csv"
+SEED_OUTPUT_PATH = MATERIALS_DIR + "seed_relations.csv"
+BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "seed_relations_basic.csv"
+TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "seed_trigger_word.csv"
 
 if __name__ == '__main__':
     config = {
