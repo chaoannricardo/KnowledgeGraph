@@ -1,25 +1,37 @@
 # -*- encoding: utf8 -*-
+from tqdm import tqdm
 import codecs
 import matplotlib.pyplot as plt
 import pandas as pd
 
 ''' Configurations '''
-MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
-SEED_IMPORT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic.csv"
-FILTER_SEED_EXPORT_PATH = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"
-FILTER_COUNT_CRITEREA = 14
+MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/"
+SEED_IMPORT_PATH = MATERIALS_DIR + "seed_relations.csv"
+SEED_BASIC_IMPORT_PATH = MATERIALS_DIR + "seed_relations_basic.csv"
+FILTER_SEED_BASIC_EXPORT_PATH = MATERIALS_DIR + "seed_relations_basic_filtered.csv"
+FILTER_SEED_EXPORT_PATH = MATERIALS_DIR + "seed_relations_filtered.csv"
+FILTER_COUNT_CRITERIA = 14
 IF_SHOW_ESTIMATE_CURVE = True
 STARTING_FILTER = 5
 
 if __name__ == '__main__':
+    # list to store seed pattern
     seed_pattern_list = []
 
-    seed_basic = codecs.open(SEED_IMPORT_PATH, mode="r", encoding="utf8", errors="ignore")
+    # read in seeds
+    seed = codecs.open(SEED_IMPORT_PATH, mode="r", encoding="utf8", errors="ignore")
+    seed_basic = codecs.open(SEED_BASIC_IMPORT_PATH, mode="r", encoding="utf8", errors="ignore")
+
+    # create file to write
     seed_filter_export = codecs.open(FILTER_SEED_EXPORT_PATH, mode="w", encoding="utf8", errors="ignore")
-    starting_filter = STARTING_FILTER if IF_SHOW_ESTIMATE_CURVE else FILTER_COUNT_CRITEREA
+    seed_filter_basic_export = codecs.open(FILTER_SEED_BASIC_EXPORT_PATH, mode="w", encoding="utf8", errors="ignore")
+
+    # plot usage: showing seeds count from what number of fileter
+    starting_filter = STARTING_FILTER if IF_SHOW_ESTIMATE_CURVE else FILTER_COUNT_CRITERIA
     filter_num_list = []
     filter_seed_count_list = []
 
+    # mask out each pattern's predicate and store into list
     for seedIndex, seedElement in enumerate(seed_basic.readlines()):
         original_pattern = seedElement.split("&")[0]
         relation = seedElement.split("&")[1]
@@ -27,8 +39,9 @@ if __name__ == '__main__':
         seed_pattern_list.append(original_pattern)
 
     # initiate object to prevent warning
+    # filter seed by iteration, in order to create plot
     data_filter = None
-    for iteration in range(starting_filter, FILTER_COUNT_CRITEREA):
+    for iteration in range(starting_filter, FILTER_COUNT_CRITERIA):
         # calculate and filter out import seeds
         data_calculate = pd.DataFrame({
             "SeedType": seed_pattern_list
@@ -39,12 +52,28 @@ if __name__ == '__main__':
         filter_num_list.append(iteration)
         filter_seed_count_list.append(len(data_filter))
 
+    # write filtered seed into files
     for lineIndex, lineElement in enumerate(data_filter):
-        seed_filter_export.write(lineElement + "\n")
+        seed_filter_basic_export.write(lineElement + "\n")
 
-    print(filter_num_list)
-    print(filter_seed_count_list)
+    print("Filter Threshold", filter_num_list)
+    print("Seed Type Count", filter_seed_count_list)
 
+    # filter original seed and export
+    print("Now filtering original seeds...")
+    for lineIndex, line in enumerate(tqdm(seed.readlines())):
+        line = line.replace("\n", "")
+        edge = line.split("&")[1]
+        dependency_node_list = line.split("&")[0].split("@")
+        dependency_node_list[0] = "Entity"
+        dependency_node_list[-1] = "Entity"
+        dependency_node_list[dependency_node_list.index(edge)] = "Predicate"
+        basic_pattern = "@".join(dependency_node_list)
+
+        if basic_pattern in data_filter:
+            seed_filter_export.write(line + "\n")
+
+    # plotting filtering curve
     if IF_SHOW_ESTIMATE_CURVE:
         plt.bar(filter_num_list, filter_seed_count_list)
         plt.xlabel("Filter Threshold")
@@ -57,8 +86,6 @@ if __name__ == '__main__':
             plt.text(x=filter_num_list[i]-0.2, y=filter_seed_count_list[i] + 0.5,
                      s=filter_seed_count_list[i], size=10, c="navy",
                      fontweight="bold")
-
-
         plt.show()
 
 
