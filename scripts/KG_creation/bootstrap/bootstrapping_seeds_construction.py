@@ -14,33 +14,39 @@ import stanza
 
 ''' Configurations '''
 MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/"
+STANZA_MODEL_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/stanza_resources/"
 SEED_RELATION_PATH = MATERIALS_DIR + "duie_train.csv"
 SEED_OUTPUT_PATH = MATERIALS_DIR + "seed_relations.csv"
 BASIC_SEED_OUTPUT_PATH = MATERIALS_DIR + "seed_relations_basic.csv"
 TRIGGER_WORD_OUTPUT_PATH = MATERIALS_DIR + "seed_trigger_word.csv"
 
-if __name__ == '__main__':
-    config = {
+stanza_config = {
         'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
         'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
-        'tokenize_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/tokenize/gsd.pt',
+        'tokenize_model_path': STANZA_MODEL_DIR + '/zh-hant/tokenize/gsd.pt',
         # Processor-specific arguments are set with keys "{processor_name}_{argument_name}"
-        'pos_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/pos/gsd.pt',
-        'pos_pretrain_path': MATERIALS_DIR + 'stanza_resources/zh-hant/pretrain/gsd.pt',
-        'lemma_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/lemma/gsd.pt',
-        'depparse_model_path': MATERIALS_DIR + 'stanza_resources/zh-hant/depparse/gsd.pt',
-        'depparse_pretrain_path': MATERIALS_DIR + 'stanza_resources/zh-hant/pretrain/gsd.pt',
+        'pos_model_path': STANZA_MODEL_DIR + '/zh-hant/pos/gsd.pt',
+        'pos_pretrain_path': STANZA_MODEL_DIR + '/zh-hant/pretrain/gsd.pt',
+        'lemma_model_path': STANZA_MODEL_DIR + '/zh-hant/lemma/gsd.pt',
+        'depparse_model_path': STANZA_MODEL_DIR + '/zh-hant/depparse/gsd.pt',
+        'depparse_pretrain_path': STANZA_MODEL_DIR + '/zh-hant/pretrain/gsd.pt',
     }
 
-    ''' Process Starts '''
+if __name__ == '__main__':
+    # read in ground truth data
     file_import = codecs.open(SEED_RELATION_PATH, mode="r", encoding="utf8", errors="ignore")
+
+    # create file to write
     file_export = codecs.open(SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     file_export_basic = codecs.open(BASIC_SEED_OUTPUT_PATH, mode="w", encoding="utf8")
     file_trigger_word = codecs.open(TRIGGER_WORD_OUTPUT_PATH, mode="w", encoding="utf8")
-    nlp = stanza.Pipeline(**config)
+
+    # initiate stanza nlp engine
+    nlp = stanza.Pipeline(**stanza_config)
 
     trigger_word_list = []
 
+    # iterate through lines inside relation training data text
     for lineIndex, line in enumerate(tqdm(file_import.readlines())):
         if lineIndex == 0:
             continue
@@ -69,6 +75,7 @@ if __name__ == '__main__':
             "Edge": []
         })
 
+        # create data_map to construct networkx graph
         for sent in doc.sentences:
             for word in sent.words:
                 # print(f"id: {word.id}", f"word: {word.text}", f"head id: {word.head}",
@@ -129,6 +136,7 @@ if __name__ == '__main__':
         if len(e_1_index) == 0 or len(e_2_index) == 0 or len(e_3_index) == 0:
             continue
 
+        # create shortest dependency path among nodes
         shortest_path_list = []
         for firstIndex, e_1Element in enumerate(e_1_index):
             for secondIndex, e_2Element in enumerate(e_2_index):
@@ -165,10 +173,12 @@ if __name__ == '__main__':
                     basic_output_list[-1] = "Entity"
                     # basic_output_list[predicateIndex] = "Predicate"
 
-                    file_export.write("@".join(edges) + "\n")
+                    # write seed relations and basic seed relations into file.
+                    file_export.write("@".join(edges) + "&" + predicate + "\n")
                     file_export_basic.write("@".join(basic_output_list) + "&" + predicate + "\n")
                     trigger_word_list.append(predicate)
 
+    # write trigger words
     trigger_word_list = list(set(trigger_word_list))
     file_trigger_word.write(",".join(trigger_word_list))
 
