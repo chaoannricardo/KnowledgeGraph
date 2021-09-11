@@ -45,7 +45,7 @@ if __name__ == '__main__':
                 dependency_path_list[0] = "@Entity"
                 dependency_path_list[-1] = "@Entity"
                 dependency_path_list[dependency_path_list.index(edge)] = "@Predicate"
-                dependency_path = "&".join(dependency_path_list)
+                dependency_path = " & ".join(dependency_path_list)
 
                 # store patterns
                 if dependency_path not in patterns:
