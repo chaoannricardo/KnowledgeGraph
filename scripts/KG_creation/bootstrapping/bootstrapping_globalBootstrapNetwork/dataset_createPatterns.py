@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # write entities & entity_label
     for entity in nodes:
         file_output_entities.write(str(entity) + "\n")
-        file_output_entities_labels.write("\t".join([str(entity), "0"]) + "\n")
+        file_output_entities_labels.write("\t".join([str(nodes.index(entity)), "0"]) + "\n")
 
     # write labels
     file_output_labels.write("Entity")
