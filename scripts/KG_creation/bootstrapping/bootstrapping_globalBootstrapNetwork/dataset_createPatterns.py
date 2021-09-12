@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from tqdm import tqdm
 import codecs
+import numpy as np
 
 ''' Configurations '''
 MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
@@ -73,10 +74,11 @@ if __name__ == '__main__':
     file_output_labels.write("Entity")
 
     # write patterns
-    file_output_pattern_label_vocab.write("0")
+    for index in range(len(patterns)+1):
+        file_output_pattern_label_vocab.write(str(index) + "\n")
 
-    for patternIndex, pattern in enumerate(patterns):
-        file_output_pattern_label.write("\t".join([str(patternIndex), "0"]) + "\n")
+    for patternIndex, pattern in enumerate(patterns + patterns):
+        file_output_pattern_label.write("\t".join([str(patternIndex), "1"]) + "\n")
         file_output_pattern.write(pattern + "\n")
 
 
