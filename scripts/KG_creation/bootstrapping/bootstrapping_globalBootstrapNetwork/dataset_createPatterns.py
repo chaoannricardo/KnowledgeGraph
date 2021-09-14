@@ -6,7 +6,7 @@ import numpy as np
 ''' Configurations '''
 MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
 SEED_DIR = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_Cleansed/"
-OUTPUT_DIR = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_GBN/doc_un_1/"
+OUTPUT_DIR = MATERIALS_DIR + "data_kg/baiduDatasetTranditional_GBN_dependency/doc_un_1/"
 # pattern type
 # 0: Dependency Pattern
 # 1: Relation
