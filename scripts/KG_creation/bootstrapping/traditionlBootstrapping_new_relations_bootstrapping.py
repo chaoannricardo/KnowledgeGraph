@@ -52,10 +52,10 @@ TRIGGER_WORD_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/baiduDatas
 
 # small dataset
 DATA_IMPORT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION.csv"
-NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_BASIC.csv"
-NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
-NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_TRIGGER_WORD.csv"
+NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_relationTriples.csv"
+NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_relationTriples_Basic.csv"
+NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_relationTriples_Whole.csv"
+NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_triggerWords.csv"
 
 # large dataset
 # DATA_IMPORT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/data_normal_wafer_textAll/"  # data used to find new relations
@@ -90,7 +90,7 @@ CONTINUE_WORD_UPOS_LAST = ["PART"]
 CONTINUE_WORD_XPOS = []
 CONTINUE_SEARCHING_LIMIT = 2
 TOLERATE_DIFFERENCE = 3
-THIRD_PHASE_COUNT_THERSHOLD = 0.01
+THIRD_PHASE_COUNT_THERSHOLD = 0.5
 ITERATIONS = 10
 
 if __name__ == '__main__':
@@ -138,7 +138,13 @@ if __name__ == '__main__':
     # load spaCy engines
     nlp = stanza.Pipeline(**config)
 
-    ''' bootstrapping starts '''
+    '''
+    Bootstrapping starts
+    
+    First Phase:
+    Second Phase:
+    Third Phase: 
+    '''
     first_phase_relation_list = []
     first_phase_relation_list_whole = []
     first_phase_relation_list_no_trigger = []
@@ -156,6 +162,7 @@ if __name__ == '__main__':
 
     for fileIndex, fileElement in enumerate(os.listdir(DATA_IMPORT_PATH)):
 
+        # read in text data to apply bootstrapping
         data_import = codecs.open(DATA_IMPORT_PATH + fileElement, mode="r", encoding="utf8", errors="ignore")
 
         ''' Enumerate over file lines '''
@@ -186,8 +193,8 @@ if __name__ == '__main__':
                 line = line[1:]
             if line[-1] in PUNT_CHAR:
                 line = line[:-1]
-            ''' ended '''
 
+           # split sentences with certain punctuations
             for sublineIndex, subline in enumerate(re.split("|".join(["。", "；"]), line)):
                 # create graph to find shortest path
                 nodes = []
@@ -579,9 +586,6 @@ if __name__ == '__main__':
     data_third_phase_candidate_filter = data_third_phase_candidate_filter.iloc[:int(np.around((len(data_third_phase_candidate_filter) * THIRD_PHASE_COUNT_THERSHOLD),
                                                                                      decimals=0)), 0].tolist()
 
-    # data_third_phase_candidate_filter = data_third_phase_candidate_filter[data_third_phase_candidate_filter.iloc[:, 1] \
-    #                                                                       > THIRD_PHASE_COUNT_THERSHOLD].iloc[:,
-    #                                     0].tolist()
     ''' Filter Ended '''
 
     for relationIndex, relationElement in enumerate(relation_list):
@@ -613,9 +617,7 @@ if __name__ == '__main__':
                                     "|" + "@".join(simple_relation_format) +
                                     "|" + "@".join(output_upos_whole["@".join(relationElement)]) +
                                     "|" + "@".join(output_xpos_whole["@".join(relationElement)]) + "\n")
-
-        # seed_output_whole.write("@".join(output_upos_whole[relationIndex]) + "\n")
-        # seed_output_whole.write("@".join(output_xpos_whole[relationIndex]) + "\n")
+            seed_output.write("@".join(relationElement) + "&" + simple_relation_format[1] + "\n")
 
     debug_list.sort()
     debug_list = list(k for k, _ in itertools.groupby(debug_list))
