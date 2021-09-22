@@ -18,78 +18,82 @@ import pandas as pd
 import re
 import stanza
 
-if __name__ == '__main__':
-    ''' Configurations '''
-    ''' World Chronology Mandarin config '''
-    # BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    # OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
-    # STOP_WORD_PATH = "../dicts/Stopwords/"
-    # SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-    # TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
 
-    # small dataset
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_TRIGGER_WORD.csv"
+''' Configurations '''
+MATERIAL_PATH = "C:/Users/User/Desktop/Ricardo/"
 
-    # # large dataset
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarinAll/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_TRIGGER_WORD.csv"
+''' World Chronology Mandarin config '''
+# BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
+# OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
+# STOP_WORD_PATH = "../dicts/Stopwords/"
+# SUBJECT_DICT_PATH = ""  # not using subject dict path for now
+# TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
 
-    ''' Semiconductor config '''
-    BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-    OBJECT_DICT_PATH = "../dicts/Semiconductor/EntityDict/"
-    STOP_WORD_PATH = "../dicts/Stopwords/"
-    SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-    TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
+# small dataset
+# DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
+# NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION.csv"
+# NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_BASIC.csv"
+# NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
+# NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_TRIGGER_WORD.csv"
 
-    # small dataset
-    # DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-    # NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION.csv"
-    # NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_BASIC.csv"
-    # NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
-    # NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/Semiconductor/SEED_TRIGGER_WORD.csv"
+# # large dataset
+# DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarinAll/"  # data used to find new relations
+# NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION.csv"
+# NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_BASIC.csv"
+# NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
+# NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_TRIGGER_WORD.csv"
 
-    # large dataset
-    DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/data_normal_wafer_textAll/"  # data used to find new relations
-    NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION.csv"
-    NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_BASIC.csv"
-    NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
-    NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_TRIGGER_WORD.csv"
+''' Semiconductor config '''
+BASIC_SEED_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"  # seed dictionary constructed by former script
+OBJECT_DICT_PATH = "../../dicts/Semiconductor/EntityDict/"
+STOP_WORD_PATH = "../../dicts/Stopwords/"
+SUBJECT_DICT_PATH = ""  # not using subject dict path for now
+TRIGGER_WORD_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
+
+# small dataset
+DATA_IMPORT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
+NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION.csv"
+NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_BASIC.csv"
+NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_RELATION_WHOLE.csv"
+NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/SEED_TRIGGER_WORD.csv"
+
+# large dataset
+# DATA_IMPORT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/data_normal_wafer_textAll/"  # data used to find new relations
+# NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION.csv"
+# NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_BASIC.csv"
+# NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
+# NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_TRIGGER_WORD.csv"
 
 
-    config = {
-        'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
-        'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
-        'tokenize_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/tokenize/gsd.pt',
-        # Processor-specific arguments are set with keys "{processor_name}_{argument_name}"
-        'pos_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pos/gsd.pt',
-        'pos_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
-        'lemma_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/lemma/gsd.pt',
-        'depparse_model_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/depparse/gsd.pt',
-        'depparse_pretrain_path': '../../../KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
-    }
-    REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
+config = {
+    'processors': 'tokenize,pos,lemma,depparse',  # Comma-separated list of processors to use
+    'lang': 'zh-hant',  # Language code for the language to build the Pipeline in
+    'tokenize_model_path': MATERIAL_PATH + 'KnowledgeGraph_materials/stanza_resources/zh-hant/tokenize/gsd.pt',
+    # Processor-specific arguments are set with keys "{processor_name}_{argument_name}"
+    'pos_model_path': MATERIAL_PATH + 'KnowledgeGraph_materials/stanza_resources/zh-hant/pos/gsd.pt',
+    'pos_pretrain_path': MATERIAL_PATH + 'KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
+    'lemma_model_path': MATERIAL_PATH + 'KnowledgeGraph_materials/stanza_resources/zh-hant/lemma/gsd.pt',
+    'depparse_model_path': MATERIAL_PATH + 'KnowledgeGraph_materials/stanza_resources/zh-hant/depparse/gsd.pt',
+    'depparse_pretrain_path': MATERIAL_PATH + 'KnowledgeGraph_materials/stanza_resources/zh-hant/pretrain/gsd.pt',
+}
+
+REPLACE_CHAR = ["(", "（", "[", "［", "{", "｛", "<", "＜", "〔", "【", "〖", "《", "〈", ")", "）", "]", "］", "}", "｝", ">",
                     "＞", "〕", "】", "〗", "》", "〉", "\r\n", "ˋ"]
-    PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
-    CONJUCTION_CHAR = ["的", "之", "及", "與", "等", "前"]
-    NEGLECT_CHAR = ["「", "」", " ", "\n", "-", "——", "?"]
-    NEGLECT_UPOS = ["PART", "PFA", "NUM", "CCONJ"]
-    NEGLECT_XPOS = ["SFN"]
-    NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
-    CONTINUE_WORD_UPOS_FIRST = ["PROPN", "ADJ"]  # "NOUN"
-    CONTINUE_WORD_UPOS_LAST = ["PART"]
-    CONTINUE_WORD_XPOS = []
-    CONTINUE_SEARCHING_LIMIT = 2
-    TOLERATE_DIFFERENCE = 3
-    THIRD_PHASE_COUNT_THERSHOLD = 0.01
-    ITERATIONS = 10
+PUNT_CHAR = ["，", "。", "！", "!", "？", "；", ";", "：", "、"]
+CONJUCTION_CHAR = ["的", "之", "及", "與", "等", "前"]
+NEGLECT_CHAR = ["「", "」", " ", "\n", "-", "——", "?"]
+NEGLECT_UPOS = ["PART", "PFA", "NUM", "CCONJ"]
+NEGLECT_XPOS = ["SFN"]
+NOUN_ENTITY_UPOS = ["PROPN", "NOUN", "PART"]
+CONTINUE_WORD_UPOS_FIRST = ["PROPN", "ADJ"]  # "NOUN"
+CONTINUE_WORD_UPOS_LAST = ["PART"]
+CONTINUE_WORD_XPOS = []
+CONTINUE_SEARCHING_LIMIT = 2
+TOLERATE_DIFFERENCE = 3
+THIRD_PHASE_COUNT_THERSHOLD = 0.01
+ITERATIONS = 10
 
+if __name__ == '__main__':
     ''' Process Starts '''
     # data to import
     trigger_word_dict = codecs.open(TRIGGER_WORD_PATH, mode="r", encoding="utf8", errors="ignore")
