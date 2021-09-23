@@ -20,49 +20,43 @@ import stanza
 
 
 ''' Configurations '''
-MATERIAL_PATH = "C:/Users/User/Desktop/Ricardo/"
+MATERIAL_PATH = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
 
-''' World Chronology Mandarin config '''
-# BASIC_SEED_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_RELATION_BASIC_FILTER.csv"  # seed dictionary constructed by former script
-# OBJECT_DICT_PATH = "../dicts/WorldChronolgy/EntityDict/"
-# STOP_WORD_PATH = "../dicts/Stopwords/"
-# SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-# TRIGGER_WORD_PATH = "../../../KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/SEED_TRIGGER_WORD.csv"
-
-# small dataset
-# DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarin/"  # data used to find new relations
-# NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION.csv"
-# NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_BASIC.csv"
-# NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
-# NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_TRIGGER_WORD.csv"
-
-# # large dataset
-# DATA_IMPORT_PATH = "../../../KnowledgeGraph_materials/data_kg/WorldChronologyMandarinAll/"  # data used to find new relations
-# NEW_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION.csv"
-# NEW_BASIC_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_BASIC.csv"
-# NEW_WHOLE_SEED_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_RELATION_WHOLE.csv"
-# NEW_TRIGGER_WORD_OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronologyAll/SEED_TRIGGER_WORD.csv"
-
-''' Semiconductor config '''
-BASIC_SEED_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"  # seed dictionary constructed by former script
+BASIC_SEED_PATH = MATERIAL_PATH + "data_kg/baiduDatasetTranditional_Cleansed/seed_relations_basic_filtered.csv"  # seed dictionary constructed by former script
 OBJECT_DICT_PATH = "../../dicts/Semiconductor/EntityDict/"
 STOP_WORD_PATH = "../../dicts/Stopwords/"
 SUBJECT_DICT_PATH = ""  # not using subject dict path for now
-TRIGGER_WORD_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
+TRIGGER_WORD_PATH = MATERIAL_PATH + "data_kg/baiduDatasetTranditional_Cleansed/seed_trigger_word.csv"
 
+''' World Chronology Mandarin config '''
 # small dataset
-DATA_IMPORT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/data_normal_wafer_text/"  # data used to find new relations
-NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_relationTriples.csv"
-NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_relationTriples_Basic.csv"
-NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_relationTriples_Whole.csv"
-NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/Semiconductor/bootstrapped_triggerWords.csv"
+# DATA_IMPORT_PATH = "data_kg/WorldChronologyMandarin/"  # data used to find new relations
+# NEW_SEED_OUTPUT_PATH = "results_kg/WorldChronology/bootstrapped_relationTriples.csv"
+# NEW_BASIC_SEED_OUTPUT_PATH = "results_kg/WorldChronology/bootstrapped_relationTriples_Basic.csv"
+# NEW_WHOLE_SEED_OUTPUT_PATH = "results_kg/WorldChronology/bootstrapped_relationTriples_Whole.csv"
+# NEW_TRIGGER_WORD_OUTPUT_PATH = "results_kg/WorldChronology/bootstrapped_triggerWords.csv"
+
+# # large dataset
+# DATA_IMPORT_PATH = "data_kg/WorldChronologyMandarinAll/"  # data used to find new relations
+# NEW_SEED_OUTPUT_PATH = "results_kg/WorldChronologyAll/bootstrapped_relationTriples.csv"
+# NEW_BASIC_SEED_OUTPUT_PATH = "results_kg/WorldChronologyAll/bootstrapped_relationTriples_Basic.csv"
+# NEW_WHOLE_SEED_OUTPUT_PATH = "results_kg/WorldChronologyAll/bootstrapped_relationTriples_Whole.csv"
+# NEW_TRIGGER_WORD_OUTPUT_PATH = "esults_kg/WorldChronologyAll/bootstrapped_triggerWords.csv"
+
+''' Semiconductor config '''
+# small dataset
+DATA_IMPORT_PATH = MATERIAL_PATH + "data_kg/data_normal_wafer_text/"  # data used to find new relations
+NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "results_kg/Semiconductor/bootstrapped_relationTriples.csv"
+NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "results_kg/Semiconductor/bootstrapped_relationTriples_Basic.csv"
+NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "results_kg/Semiconductor/bootstrapped_relationTriples_Whole.csv"
+NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "results_kg/Semiconductor/bootstrapped_triggerWords.csv"
 
 # large dataset
-# DATA_IMPORT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/data_kg/data_normal_wafer_textAll/"  # data used to find new relations
-# NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION.csv"
-# NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_BASIC.csv"
-# NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_RELATION_WHOLE.csv"
-# NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "KnowledgeGraph_materials/results_kg/SemiconductorAll/SEED_TRIGGER_WORD.csv"
+# DATA_IMPORT_PATH = MATERIAL_PATH + "data_kg/data_normal_wafer_textAll/"  # data used to find new relations
+# NEW_SEED_OUTPUT_PATH = MATERIAL_PATH + "results_kg/SemiconductorAll/bootstrapped_relationTriples.csv"
+# NEW_BASIC_SEED_OUTPUT_PATH = MATERIAL_PATH + "results_kg/SemiconductorAll/bootstrapped_relationTriples_Basic.csv"
+# NEW_WHOLE_SEED_OUTPUT_PATH = MATERIAL_PATH + "results_kg/SemiconductorAll/bootstrapped_relationTriples_Whole.csv"
+# NEW_TRIGGER_WORD_OUTPUT_PATH = MATERIAL_PATH + "results_kg/SemiconductorAll/bootstrapped_triggerWords.csv"
 
 
 config = {
@@ -90,8 +84,8 @@ CONTINUE_WORD_UPOS_LAST = ["PART"]
 CONTINUE_WORD_XPOS = []
 CONTINUE_SEARCHING_LIMIT = 2
 TOLERATE_DIFFERENCE = 3
-THIRD_PHASE_COUNT_THERSHOLD = 0.5
-ITERATIONS = 10
+THIRD_PHASE_COUNT_THERSHOLD = 0.8
+
 
 if __name__ == '__main__':
     ''' Process Starts '''

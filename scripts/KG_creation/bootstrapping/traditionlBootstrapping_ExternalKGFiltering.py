@@ -12,11 +12,11 @@ import time
 
 
 ''' Configurations '''
-''' World Chronology Mandarin config '''
 MATERIALS_DIR = "C:/Users/User/Desktop/Ricardo/KnowledgeGraph_materials/"
 RECONNECT_SECONDS = 1200
 RECOGNIZED_EXISTING_WORD_FREQUENCY = 10
 
+''' World Chronology Mandarin config '''
 # small dataset
 # LOAD_RELATION_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/SEED_RELATION_WHOLE.csv"
 # OUTPUT_PATH = "../../../KnowledgeGraph_materials/results_kg/WorldChronology/STRICT_SEED_RELATION_WHOLE.csv"
