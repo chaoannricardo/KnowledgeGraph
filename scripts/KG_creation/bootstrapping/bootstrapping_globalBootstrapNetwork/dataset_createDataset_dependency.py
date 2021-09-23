@@ -50,8 +50,10 @@ if __name__ == '__main__':
                 if file_path == SEED_PATH and entity not in seed_node_list:
                     seed_node_list.append(entity)
 
-            # stor node set for whole node usage
-            node_set_list.append(node_set)
+            # store node set for whole node usage
+            if node_set not in node_set_list:
+                node_set_list.append(node_set)
+
             if file_path == SEED_PATH and node_set not in seed_node_set_list:
                 seed_node_set_list.append(node_set)
 
@@ -80,7 +82,6 @@ if __name__ == '__main__':
 
             except ValueError:
                 continue
-
 
     # write entities & entity_label
     writing_entity_list = nodes if NODE_SET_TYPE == 0 else node_set_list
